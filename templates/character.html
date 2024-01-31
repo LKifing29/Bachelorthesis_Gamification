@@ -1,0 +1,18 @@
+<!-- Character.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herzlich Willkommen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Herzlich willkommen zur Charaktererstellung</h1>
+        <p>Hier geht's weiter zum Skilltree</p>
+        <a href="{{ url_for('skilltree') }}" class="button next-button">Next</a>
+    </div>
+</body>
+</html>

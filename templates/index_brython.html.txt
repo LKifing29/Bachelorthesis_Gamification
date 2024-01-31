@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Tree</title>
+    <script type="text/javascript" src="https://brython.info/src/brython.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='skill_tree_brython.py') }}"></script>
+</head>
+<body onload="brython()">
+    <div id="skill-tree"></div>
+</body>
+</html>

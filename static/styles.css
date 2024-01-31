@@ -1,0 +1,192 @@
+/* skilltree */
+.skill-node {
+    user-select: none; //Textmarkierung deaktiviert
+}
+
+.category-node {
+    user-select: none; //Textmarkierung deaktiviert
+}
+
+/* Für die Buttons */
+.button {
+    user-select: none; //Textmarkierung deaktiviert
+}
+
+.next-button {
+    user-select: none; //Textmarkierung deaktiviert
+}
+
+.back-button {
+    user-select: none; //Textmarkierung deaktiviert
+}
+
+.setting-button {
+    bottom: 20px;
+}
+
+.add-skill-button {
+    user-select: none; //Textmarkierung deaktiviert
+
+}
+
+.hidden {
+    display: none;
+}
+
+.category-node{
+    position: absolute;
+    width: 100px;  /* Adjusted size */
+    height: 100px;  /* Adjusted size */
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #00B2C4; /* Default color */
+    color: black;  /* Font color */
+}
+
+.skill-node {
+    position: absolute;
+    width: 90px;  /* Adjusted size */
+    height: 90px;  /* Adjusted size */
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #a9a9a9; /* Default color */
+    color: black;  /* Font color */
+}
+
+.skill-node.active {
+    background-color: #00B2C4; /* Active color, you can change it */
+}
+
+.skill-node.start {
+    background-color: #00B2C4; /* Active color, you can change it */
+    width: 100px;  /* Adjusted size */
+    height: 100px;  /* Adjusted size */
+}
+
+.skill-node.category {
+    background-color: #00B2C4; /* Active color, you can change it */
+}
+
+.skill-node.custom {
+    background-color: #69a5a9; /* Custom color, you can change it */
+}
+
+.skill-node.hidden {
+    display: none;
+}
+
+/* Add a new class for the lines between skills */
+.skill-connection {
+    position: absolute;
+    background-color: black; /* Line color */
+    z-index: -1;  /* Place the lines behind the nodes */
+    pointer-events: none;  /* Ensure lines do not block mouse interaction with nodes */
+    width: 2px;  /* Set a default width for the lines */
+    transform-origin: top;  /* Set the rotation origin to the top */
+}
+
+/* startingpage */
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-size: 13px;
+}
+
+.welcome-container {
+    text-align: center;
+}
+
+.button {
+    position: absolute;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #00B2C4;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.buttons-container {
+    position: absolute; /* Positionierung relativ zum übergeordneten .category-node */
+    top: 68%; /* Platzieren Sie den Container direkt unterhalb des Namens */
+    left: 50%; /* Zentrieren Sie den Container horizontal */
+    transform: translateX(-50%); /* Zentrieren Sie den Container horizontal relativ zur Breite */
+    display: flex;
+    flex-direction: row;
+}
+
+.button:hover {
+    background-color: #00B2C4;
+    transform: scale(1.1);
+}
+
+.add-skill-button {
+    display: none; /* Der Button ist standardmäßig ausgeblendet */
+    padding: 1px;
+    right: -15px; /* Abstand vom rechten Rand des .skill-node */
+    top:0%; /* Zentrieren Sie den Button vertikal im .skill-node */
+    background-color: transparent; /* Transparenter Hintergrund */
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 20px;
+    color: black;  /* Font color */
+}
+
+.category-node:hover .add-skill-button {
+    display: inline-block; /* Der Button wird angezeigt, wenn die Kategorie mit der Maus überfahren wird */
+}
+
+.delete-skill-button {
+    display: none; /* Der Button ist standardmäßig ausgeblendet */
+    padding: 1px;
+    right: -10px; /* Abstand vom rechten Rand des .skill-node */
+    top:0%; /* Zentrieren Sie den Button vertikal im .skill-node */
+    background-color: transparent; /* Transparenter Hintergrund */
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 20px;
+    color: black;  /* Font color */
+}
+
+.skill-node:hover .delete-skill-button {
+    display: inline-block; /* Der Button wird angezeigt, wenn die Kategorie mit der Maus überfahren wird */
+}
+
+.back-button {
+    top: 10px;
+    left: 10px;
+}
+
+.next-button {
+    top: 10px;
+    right: 10px;
+}
+
+/* Experience */
+.experience-display {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: #ffffff;  /* Textfarbe anpassen */
+    font-size: 12px;  /* Schriftgröße anpassen */
+    background-color: #000000;  /* Hintergrundfarbe anpassen */
+    padding: 2px 5px;  /* Innenabstand anpassen */
+}
+
+
+
