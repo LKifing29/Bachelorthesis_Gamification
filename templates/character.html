@@ -5,14 +5,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herzlich Willkommen</title>
+    <title>Creating your Character</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="welcome-container">
-        <h1>Herzlich willkommen zur Charaktererstellung</h1>
-        <p>Hier geht's weiter zum Skilltree</p>
-        <a href="{{ url_for('skilltree') }}" class="button next-button">Next</a>
+    <div class="container">
+        <form method="post" action="/process_character" enctype="multipart/form-data">
+            <div class="welcome-container">
+                <h1>Creating your Character</h1>
+
+            </div>
+            <div class="fields-container">
+                <div class="field">
+                    <input type="text" id="firstName" name="firstName" placeholder="..." value="{{ first_name }}" />
+                    <label for="firstName">First Name</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="lastName" name="lastName" placeholder="..." value="{{ last_name }}" />
+                    <label for="lastName">Last Name</label>
+                </div>
+                <div class="field">
+                    <input type="number" id="age" name="age" placeholder="..." value="{{ age }}" />
+                    <label for="age">Age</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="origin" name="origin" placeholder="..." value="{{ origin }}" />
+                    <label for="origin">Origin</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="knowledge" name="knowledge" placeholder="..." value="{{ knowledge }}" />
+                    <label for="knowledge">Knowledge</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="..." value="{{ phone_number }}" />
+                    <label for="phoneNumber">Phone-Number</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="address" name="address" placeholder="..." value="{{ address }}" />
+                    <label for="address">Address</label>
+                </div>
+                <div class="field">
+                    <input type="text" id="email" name="email" placeholder="..." value="{{ email }}" />
+                    <label for="email">Email</label>
+                </div>
+                <div class="field-radio">
+                    <label>Gender:</label>
+                    <div>
+                        <input type="radio" id="male" name="gender" value="male" {% if session.get('gender') == 'male' %} checked {% endif %}>
+                        <label for="male">Male</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="female" name="gender" value="female" {% if session.get('gender') == 'female' %} checked {% endif %}>
+                        <label for="female">Female</label>
+                    </div>
+                </div>
+            </div>
+            <div class="image-container">
+                <input type="file" id="image-upload" accept="image/*">
+                <label for="image-upload" id="image-upload-label">
+                    <img id="uploaded-image" src="{{ url_for('static', filename='upload.svg') }}" alt="Upload image">
+                </label>
+
+            </div>
+            <div class="submit-container">
+                <button type="submit" formaction="/process_character" class="button next-button">Next</button>
+            </div>
+        </form>
+
     </div>
+
+    <script>
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const image = document.getElementById('uploaded-image');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                image.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        /*
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const image = document.getElementById('uploaded-image');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageData = e.target.result;
+                fetch('/save_image_data', {
+                    method: 'POST',
+                    body: JSON.stringify({ image_data: imageData }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('Bild erfolgreich gespeichert.');
+                    } else {
+                        console.error('Fehler beim Speichern des Bildes.');
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        */
+    </script>
 </body>
 </html>

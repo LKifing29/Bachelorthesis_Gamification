@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <form method="post" action="/">
+    <form method="post" action="/" class="skilltree-container">
     {% for node in skill_tree_data %}
         {% if node.is_category %}
         <div class="category-node"
@@ -56,7 +56,7 @@
                 <span class="experience-display">{{ node.experience_level }}/3</span>
             {% endif %}
             {% if node.is_custom_node%}
-                <button class="button delete-skill-button">-</button>
+                <button class="button delete-skill-button">x</button>
             {% endif %}
             <!-- Verbindungslinie als Kindsknoten -->
             {% for connection in connections_data %}
@@ -72,9 +72,11 @@
         {% endif %}
     {% endfor %}
 
-        <button type="submit" id="applyButton" class="button next-button">Apply</button>
-        <button id="toggleExperienceButton" class="button setting-button">Toggle Experience Displays</button>
-        <a href="{{ url_for('character') }}" class="button back-button">Back</a>
+        <button type="submit" id="applyButton" class="button submit-button bottom-sticky">Apply</button>
+        <button id="toggleExperienceButton" class="button setting-button bottom-sticky">Toggle Experience Displays</button>
+        <a href="{{ url_for('character') }}" id="backButton" class="button back-button top-sticky">Back</a>
+        <a href="{{ url_for('perkmenu') }}" id="nextButton" class="button next-button top-sticky">Next</a>
+
     </form>
 
     {% if activated_skills %}
@@ -89,8 +91,52 @@
     {% endif %}
 
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.querySelector('.skilltree-container');
+
+            formContainer.addEventListener('scroll', function() {
+                const topButtons = document.querySelectorAll('.top-sticky');
+                topButtons.forEach(function(button) {
+                    const rect = button.getBoundingClientRect();
+                    const isAtTop = rect.top >= 0;
+
+                    if (!isAtTop) {
+                        button.style.position = 'absolute';
+                        button.style.top = '0';
+                    } else {
+                        button.style.position = 'sticky';
+                        button.style.top = '0';
+                    }
+                    button.style.left = '20' + 'px';
+                });
+
+                const bottomButtons = document.querySelectorAll('.bottom-sticky');
+                bottomButtons.forEach(function(button) {
+                    const rect = button.getBoundingClientRect();
+                    const isAtBottom = rect.bottom <= window.innerHeight;
+
+                    if (!isAtBottom) {
+                        button.style.position = 'absolute';
+                        button.style.bottom = 'auto';
+                        button.style.top = window.innerHeight - rect.height + 'px';
+                    } else {
+                        button.style.position = 'fixed';
+                        button.style.top = 'auto';
+                        button.style.bottom = '0';
+                    }
+                });
+            });
+        });
+
         // Initialisieren des Zählers
         let skillCounter = 1000; // Starten Sie den Zähler bei 1000 oder einer anderen geeigneten Zahl
+        document.getElementById('backButton').addEventListener('click', function(event) {
+            window.location.href = "{{ url_for('character') }}";
+        });
+        document.getElementById('nextButton').addEventListener('click', function(event) {
+            window.location.href = "{{ url_for('perkmenu') }}";
+        });
 
         document.querySelector('form').addEventListener('click', function(event) {
             if (event.target.classList.contains('skill-node')) {
@@ -111,7 +157,7 @@
         });
 
         function handleStatus(node, isCtrlPressed) {
-                if (node.dataset.parentId != null) {
+            if (node.dataset.parentId != null) {
                     const isActive = node.classList.contains('active');
                     const parentId = node.dataset.parentId;
                     const parentSkill = document.querySelector(`.category-node[data-id*='${parentId}']`);
@@ -125,12 +171,11 @@
                                         node.classList.remove('active');
                                     } else if (node.dataset.experienceLevel == 2) {
                                         node.dataset.experienceLevel = 1;
-                                    }
-                                    else if (node.dataset.experienceLevel == 3) {
+                                    } else if (node.dataset.experienceLevel == 3) {
                                         node.dataset.experienceLevel = 2;
                                     }
                                 }
-                            }else {
+                            } else {
                                 if (isActive) {
                                     if (node.dataset.experienceLevel == 1) {
                                         node.dataset.experienceLevel = 2;
@@ -145,8 +190,8 @@
                         }
                         updateExperienceDisplay(node);
                     }
-                }
-            };
+            }
+        };
 
             //Update the experience display 0/3
             function updateExperienceDisplay(node) {
@@ -187,7 +232,7 @@
                     const category = categoryNode.dataset.skillName;
                     newSkillNode.setAttribute('data-category', category);
 
-                    const parentId = categoryNode.dataset.parentId;
+                    const parentId = categoryNode.dataset.id;
                     newSkillNode.setAttribute('data-parent-id', parentId);
 
                     newSkillNode.setAttribute('data-experience-level', 0);
@@ -201,46 +246,47 @@
 
                     const deleteButton = document.createElement('button');
                     deleteButton.classList.add('button', 'delete-skill-button');
-                    deleteButton.textContent = '-';
+                    deleteButton.textContent = 'x';
                     newSkillNode.appendChild(deleteButton);
 
                     const formElement = document.querySelector('form');
                     const formRect = formElement.getBoundingClientRect();
-                    const categoryNodeRect = categoryNode.getBoundingClientRect();
                     console.log(categoryNode.skills.length);
+                    const leftPosition = parseFloat(categoryNode.style.left);
+                    const topPosition = parseFloat(categoryNode.style.top);
                     if(categoryNode.skills.length >= 0){
                         switch (categoryNode.skills.length % 8) {
                             case 0:
-                                newSkillNode.style.left = categoryNodeRect.left + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top + 125 + 'px';
+                                newSkillNode.style.left = leftPosition + 'px';
+                                newSkillNode.style.top = topPosition + 125 + 'px';;
                                 break;
                             case 1:
-                                newSkillNode.style.left = categoryNodeRect.left + 100 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top + 100 + 'px';
+                                newSkillNode.style.left = leftPosition + 100 + 'px';
+                                newSkillNode.style.top = topPosition + 100 + 'px';
                                 break;
                             case 2:
-                                newSkillNode.style.left = categoryNodeRect.left + 125 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top + 'px';
+                                newSkillNode.style.left = leftPosition + 125 + 'px';
+                                newSkillNode.style.top = topPosition + 'px';
                                 break;
                             case 3:
-                                newSkillNode.style.left = categoryNodeRect.left + 100 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top - 100 + 'px';
+                                newSkillNode.style.left = leftPosition + 100 + 'px';
+                                newSkillNode.style.top = topPosition - 100 + 'px';
                                 break;
                             case 4:
-                                newSkillNode.style.left = categoryNodeRect.left + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top - 125 + 'px';
+                                newSkillNode.style.left = leftPosition + 'px';
+                                newSkillNode.style.top = topPosition - 125 + 'px';
                                 break;
                             case 5:
-                                newSkillNode.style.left = categoryNodeRect.left - 100 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top - 100 + 'px';
+                                newSkillNode.style.left = leftPosition - 100 + 'px';
+                                newSkillNode.style.top = topPosition - 100 + 'px';
                                 break;
                             case 6:
-                                newSkillNode.style.left = categoryNodeRect.left - 125 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top + 'px';
+                                newSkillNode.style.left = leftPosition - 125 + 'px';
+                                newSkillNode.style.top = topPosition + 'px';
                                 break;
                             case 7:
-                                newSkillNode.style.left = categoryNodeRect.left -100 + 'px';
-                                newSkillNode.style.top = categoryNodeRect.top + 100 + 'px';
+                                newSkillNode.style.left = leftPosition -100 + 'px';
+                                newSkillNode.style.top = topPosition + 100 + 'px';
                                 break;
                         }
                         if((categoryNode.dataset.displayedSite * 8) <= categoryNode.skills.length - categoryNode.skills.length % 8) {
@@ -289,39 +335,41 @@
             function reorderAlgo(categoryNode, index, flag) {
                 if(categoryNode.skills.length >= 0){
                     const categoryNodeRect = categoryNode.getBoundingClientRect();
+                    const leftPosition = parseFloat(categoryNode.style.left);
+                    const topPosition = parseFloat(categoryNode.style.top);
                     categoryNode.skills.forEach(function(skillNode) {
                         switch (categoryNode.skills.indexOf(skillNode) % 8) {
                         case 0:
-                            skillNode.style.left = categoryNodeRect.left + 'px';
-                            skillNode.style.top = categoryNodeRect.top + 125 + 'px';
+                            skillNode.style.left = leftPosition + 'px';
+                            skillNode.style.top = topPosition + 125 + 'px';
                             break;
                         case 1:
-                            skillNode.style.left = categoryNodeRect.left + 100 + 'px';
-                            skillNode.style.top = categoryNodeRect.top + 100 + 'px';
+                            skillNode.style.left = leftPosition + 100 + 'px';
+                            skillNode.style.top = topPosition + 100 + 'px';
                             break;
                         case 2:
-                            skillNode.style.left = categoryNodeRect.left + 125 + 'px';
-                            skillNode.style.top = categoryNodeRect.top + 'px';
+                            skillNode.style.left = leftPosition + 125 + 'px';
+                            skillNode.style.top = topPosition + 'px';
                             break;
                         case 3:
-                            skillNode.style.left = categoryNodeRect.left + 100 + 'px';
-                            skillNode.style.top = categoryNodeRect.top - 100 + 'px';
+                            skillNode.style.left = leftPosition + 100 + 'px';
+                            skillNode.style.top = topPosition - 100 + 'px';
                             break;
                         case 4:
-                            skillNode.style.left = categoryNodeRect.left + 'px';
-                            skillNode.style.top = categoryNodeRect.top - 125 + 'px';
+                            skillNode.style.left = leftPosition + 'px';
+                            skillNode.style.top = topPosition - 125 + 'px';
                             break;
                         case 5:
-                            skillNode.style.left = categoryNodeRect.left - 100 + 'px';
-                            skillNode.style.top = categoryNodeRect.top - 100 + 'px';
+                            skillNode.style.left = leftPosition - 100 + 'px';
+                            skillNode.style.top = topPosition - 100 + 'px';
                             break;
                         case 6:
-                            skillNode.style.left = categoryNodeRect.left - 125 + 'px';
-                            skillNode.style.top = categoryNodeRect.top + 'px';
+                            skillNode.style.left = leftPosition - 125 + 'px';
+                            skillNode.style.top = topPosition + 'px';
                             break;
                         case 7:
-                            skillNode.style.left = categoryNodeRect.left -100 + 'px';
-                            skillNode.style.top = categoryNodeRect.top + 100 + 'px';
+                            skillNode.style.left = leftPosition -100 + 'px';
+                            skillNode.style.top = topPosition + 100 + 'px';
                             break;
                         }
                         const connection = skillNode.querySelector('.skill-connection');
@@ -557,21 +605,23 @@
 
             // Add: Button-Click-Handler
             const applyButton = document.getElementById('applyButton');
-            applyButton.addEventListener('click', function() {
-                event.preventDefault();  // Verhindert das Seitenneuladen
+            if(applyButton != null){
+                applyButton.addEventListener('click', function() {
+                    event.preventDefault();  // Verhindert das Seitenneuladen
 
-                const activatedSkills = document.querySelectorAll('.skill-node.active');
-                const activatedSkillNames = Array.from(activatedSkills).filter(skill => skill.dataset.skillName !== "Skills").map(skill => ({
-                    name: skill.dataset.skillName,
-                    category: skill.dataset.category,
-                    experienceLevel: skill.dataset.experienceLevel
-                    }));
+                    const activatedSkills = document.querySelectorAll('.skill-node.active');
+                    const activatedSkillNames = Array.from(activatedSkills).filter(skill => skill.dataset.skillName !== "Skills").map(skill => ({
+                        name: skill.dataset.skillName,
+                        category: skill.dataset.category,
+                        experienceLevel: skill.dataset.experienceLevel
+                        }));
 
-                console.log('Aktivierte Skills:', activatedSkillNames);
+                    console.log('Aktivierte Skills:', activatedSkillNames);
 
-                // Hier könnte eine AJAX-Anfrage an den Server gesendet werden, um die Daten zu übermitteln
-                // Beispiel: fetch('/submit_skills', { method: 'POST', body: JSON.stringify(activatedSkillNames) });
-            });
+                    // Hier könnte eine AJAX-Anfrage an den Server gesendet werden, um die Daten zu übermitteln
+                    // Beispiel: fetch('/submit_skills', { method: 'POST', body: JSON.stringify(activatedSkillNames) });
+                });
+            }
 
             function toggleSkill(skillName) {
                 const encodedSkillName = encodeURIComponent(skillName);

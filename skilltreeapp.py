@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, jsonify
-import pygame
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+
+import os
 import math
 
-import Skill
-
 app = Flask(__name__)
+app.secret_key = 'test'
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 class Skill:
     def __init__(self, name, id=None, category=None, parent_id=None, position=(0, 0), is_start_node=False, is_custom_skill=False, is_category = False ):
@@ -12,6 +14,7 @@ class Skill:
         self.id = id
         self.category = category
         self.parent_id = parent_id
+        self.position = (0, 0)
         self.is_active = False
         self.children = []
         self.position = position
@@ -122,45 +125,88 @@ def create_skill_tree():
 
     # Create skills
     # <editor-fold desc="Create skills">
-    central_skill = Skill('Skills', 1, position=(750, 400), is_start_node=True)
-    leadership_skill = Skill('Leadership', 2, central_skill, 1, position=(200, 200), is_category=True)
-    design_skill = Skill('Design', 3, central_skill,  1, position=(375, 550), is_category=True)
-    programming_skill = Skill('Programming', 4, central_skill, 1, position=(1300, 200), is_category=True)
-    communication_skill = Skill('Communication', 5, leadership_skill, 2,  position=(200, 325))
-    photoshop_skill = Skill('Photoshop', 6, design_skill, 3, position=(425, 300))
-    graphics_skill = Skill('Graphics', 7, design_skill, 3, position=(575, 300))
-    java_skill = Skill('Java', 8, programming_skill, 4, position=(1300, 75))
-    python_skill = Skill('Python', 9, programming_skill, 4, position=(1425, 200))
-    python2_skill = Skill('Python2', 9, programming_skill, 4, position=(1175, 200))
-    python3_skill = Skill('Python3', 9, programming_skill, 4, position=(1300, 325))
-    csharp_skill = Skill('C#', 10, programming_skill, 4, position=(1300, 325))
-    javascript_skill = Skill('JavaScript', 11, programming_skill, 4, position=(1400, 100))
-    php_skill = Skill('PHP', 12, programming_skill, 4, position=(1400, 300))
-    c_cplusplus_skill = Skill('C/C++', 13, programming_skill, 4, position=(1200, 300))
-    kotlin_skill = Skill('Kotlin', 14, programming_skill, 4, position=(1200, 100))
-    knowledge_management_skill = Skill('Knowledge management', 15, central_skill, 1, position=(750, 150), is_category=True)
-    delegation_skill = Skill('Delegation', 19, leadership_skill, 2, position=(300, 100))
-    empathy_skill = Skill('Empathy', 20, leadership_skill, 2, position=(200, 75))
-    integrity_skill = Skill('Integrity', 21, leadership_skill, 2, position=(100, 100))
-    creativity_skill = Skill('Creativity', 22, leadership_skill, 2, position=(325, 200))
-    flexibility_skill = Skill('Flexibility', 23, leadership_skill, 2, position=(300, 300))
-    conflict_management_skill = Skill('Conflict management', 24, leadership_skill, 2, position=(100, 300))
-    time_management_skill = Skill('Time management', 25, leadership_skill, 2, position=(75, 200))
-    others_skill = Skill('Others', 26, central_skill, 1, position=(1125, 550), is_category=True)
+    central_skill = Skill('Skills', 1, position=(750, 500), is_start_node=True)
+    leadership_skill = Skill('Leadership', 2, central_skill, 1, position=(200, 200),
+                             is_category=True)
+    design_skill = Skill('Design', 3, central_skill,  1, position=(200, 950),
+                         is_category=True)
+    programming_skill = Skill('Programming', 4, central_skill, 1, position=(1200, 200),
+                              is_category=True)
+    methodological_skill = Skill('Methodological competence', 5, central_skill, 1, position=(200, 1300),
+                                 is_category=True)
+    social_skill = Skill('Social skills', 6, central_skill, 1, position=(1200, 1800),
+                                       is_category=True)
+    others_skill = Skill('Others', 7, central_skill, 1, position=(1200, 950), is_category=True)
+    communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(750, 175),
+                                is_category=True)
+    project_management_skill = Skill('Project management', 9, central_skill, 1, position=(200, 575),
+                                is_category=True)
+    personal_skill = Skill('Personal skills', 10, central_skill, 1, position=(1200, 575),
+                                is_category=True)
+
+    photoshop_skill = Skill('Photoshop', 31, design_skill, 3, position=(425, 300))
+    graphics_skill = Skill('Graphics', 32, design_skill, 3, position=(575, 300))
+    java_skill = Skill('Java', 33, programming_skill, 4, position=(1300, 75))
+    python_skill = Skill('Python', 34, programming_skill, 4, position=(1425, 200))
+    csharp_skill = Skill('C#', 35, programming_skill, 4, position=(1300, 325))
+    javascript_skill = Skill('JavaScript', 36, programming_skill, 4, position=(1400, 100))
+    php_skill = Skill('PHP', 37, programming_skill, 4, position=(1400, 300))
+    c_cplusplus_skill = Skill('C/C++', 38, programming_skill, 4, position=(1200, 300))
+    kotlin_skill = Skill('Kotlin', 39, programming_skill, 4, position=(1200, 100))
+    delegation_skill = Skill('Delegation', 40, leadership_skill, 2, position=(300, 100))
+    listening_skill = Skill('Active listening', 41, communication_skill, 8)
+    integrity_skill = Skill('Integrity', 42, leadership_skill, 2, position=(100, 100))
+    flexibility_skill = Skill('Flexibility', 43, leadership_skill, 2, position=(300, 300))
+    criticism_skill = Skill('Express criticism', 44, leadership_skill, 2, position=(100, 300))
+    time_management_skill = Skill('Time management', 45, project_management_skill, 9)
+    prioritization_skill = Skill('Prioritization', 46, methodological_skill, 5)
+    negotiation_technique_skill = Skill('Negotiation technique', 47, methodological_skill, 5)
+    organization_skill = Skill('Organization', 48, methodological_skill, 5)
+    teamwork_skill = Skill('Teamwork', 49, social_skill, 6)
+    empathy_skill = Skill('Empathy', 50, social_skill, 6)
+    service_skill = Skill('Service orientation', 51, social_skill, 6)
+    conflict_management_skill = Skill('Conflict management', 52, social_skill, 6)
+    help_skill = Skill('Willingness to help', 53, social_skill, 6)
+    communication_with_others_skill = Skill('Communication', 54, communication_skill, 8)
+    inspire_skill = Skill('Inspire others', 55, communication_skill, 8)
+    change_willingness_skill = Skill('Willingness to change', 57, leadership_skill, 2)
+    trust_skill = Skill('Trust', 58, leadership_skill, 2)
+    trust_skill = Skill('Trust', 59, leadership_skill, 2)
+    trust_skill = Skill('Trust', 60, leadership_skill, 2)
+
+    problem_solving_skill = Skill('Problem solving', 61, project_management_skill, 9)
+    analytic_thinking_skill = Skill('Analytic thinking', 62, project_management_skill, 9)
+    building_teams_skill = Skill('Building teams', 63, project_management_skill, 9)
+    lateral_leading_skill = Skill('Lateral leading', 64, project_management_skill, 9)
 
 
 
-    #custom_skill1 = Skill('Enter own skill', 16, central_skill, 1, position=(1100, 450), is_custom_skill=True)
-    #custom_skill2 = Skill('Enter own skill', 17, custom_skill1, 16, position=(1100, 575), is_custom_skill=True)
-    #custom_skill3 = Skill('Enter own skill', 18, leadership_skill, 2, position=(50, 350), is_custom_skill=True)
-    #custom_skill4 = Skill('Enter own skill', 27, custom_skill3, 18, position=(50, 475), is_custom_skill=True)
-    #custom_skill5 = Skill('Enter own skill', 28, custom_skill4, 27, position=(50, 600), is_custom_skill=True)
-    #custom_skill6 = Skill('Enter own skill', 29, custom_skill5, 28, position=(50, 725), is_custom_skill=True)
+
+
+
 
     # </editor-fold>
 
     # Add skills
     # <editor-fold desc="Add skills to the tree">
+    skill_tree.add_skill(change_willingness_skill)
+    skill_tree.add_skill(trust_skill)
+    skill_tree.add_skill(problem_solving_skill)
+    skill_tree.add_skill(analytic_thinking_skill)
+    skill_tree.add_skill(building_teams_skill)
+    skill_tree.add_skill(lateral_leading_skill)
+    skill_tree.add_skill(listening_skill)
+    skill_tree.add_skill(communication_with_others_skill)
+    skill_tree.add_skill(inspire_skill)
+    skill_tree.add_skill(personal_skill)
+    skill_tree.add_skill(project_management_skill)
+    skill_tree.add_skill(criticism_skill)
+    skill_tree.add_skill(prioritization_skill)
+    skill_tree.add_skill(negotiation_technique_skill)
+    skill_tree.add_skill(organization_skill)
+    skill_tree.add_skill(teamwork_skill)
+    skill_tree.add_skill(service_skill)
+    skill_tree.add_skill(help_skill)
     skill_tree.add_skill(central_skill)
     skill_tree.add_skill(leadership_skill)
     skill_tree.add_skill(design_skill)
@@ -175,9 +221,8 @@ def create_skill_tree():
     skill_tree.add_skill(php_skill)
     skill_tree.add_skill(c_cplusplus_skill)
     skill_tree.add_skill(kotlin_skill)
-    skill_tree.add_skill(knowledge_management_skill)
-    #skill_tree.add_skill(custom_skill1)
-    #skill_tree.add_skill(custom_skill2)
+    skill_tree.add_skill(methodological_skill)
+    skill_tree.add_skill(social_skill)
     skill_tree.add_skill(delegation_skill)
     skill_tree.add_skill(empathy_skill)
     skill_tree.add_skill(integrity_skill)
@@ -185,12 +230,6 @@ def create_skill_tree():
     skill_tree.add_skill(conflict_management_skill)
     skill_tree.add_skill(time_management_skill)
     skill_tree.add_skill(others_skill)
-    #skill_tree.add_skill(custom_skill3)
-    #skill_tree.add_skill(custom_skill4)
-    #skill_tree.add_skill(custom_skill5)
-    #skill_tree.add_skill(custom_skill6)
-    skill_tree.add_skill(python2_skill)
-    skill_tree.add_skill(python3_skill)
     # </editor-fold>
 
 
@@ -200,14 +239,65 @@ def create_skill_tree():
 @app.route('/', methods=['GET', 'POST'])
 def home():
 
-    return render_template('startingpage.html')
+    return render_template('index.html')
 
 
-@app.route('/character')
+@app.route('/data/character', methods=['GET'])
 def character():
-    return render_template('character.html')
+    # Überprüfe, ob die Session-Variablen vorhanden sind
+    first_name = session.get('first_name')
+    last_name = session.get('last_name')
+    age = session.get('age')
+    origin = session.get('origin')
+    knowledge = session.get('knowledge')
+    phone_number = session.get('phoneNumber')
+    address = session.get('address')
+    email = session.get('email')
+    gender = session.get('gender')
+    image_data = session.get('image_data')
 
-@app.route('/skilltree.html')
+    # Gehe sicher, dass "None" nicht in das Template eingesetzt wird
+    return render_template('character.html', first_name=first_name or '',
+                           last_name=last_name or '', age=age or '', origin=origin or '',
+                           knowledge=knowledge or '', phone_number=phone_number or '',
+                           address=address or '', email=email or '', gender=gender or '',
+                           image_data=image_data or '')
+
+@app.route('/data/perkmenu', methods=['GET', 'POST'])
+def perkmenu():
+    return render_template('perkmenu.html')
+
+@app.route('/save_image_data', methods=['POST'])
+def save_image_data():
+    image_data = request.json.get('image_data')
+    session['image_data'] = image_data
+    return 'Bild erfolgreich gespeichert.', 200
+
+@app.route('/process_character', methods=['POST'])
+def process_character():
+    print("test")
+    first_name = request.form.get('firstName')
+    last_name = request.form.get('lastName')
+    age = request.form.get('age')
+    origin = request.form.get('origin')
+    knowledge = request.form.get('knowledge')
+    phone_number = request.form.get('phoneNumber')
+    address = request.form.get('address')
+    email = request.form.get('email')
+    gender = request.form.get('gender')
+    # Speichere die Daten in Session-Variablen
+    session['first_name'] = first_name
+    session['last_name'] = last_name
+    session['age'] = age
+    session['origin'] = origin
+    session['knowledge'] = knowledge
+    session['phone_number'] = phone_number
+    session['address'] = address
+    session['email'] = email
+    session['gender'] = gender
+    return redirect(url_for('skilltree'))
+
+@app.route('/data/skilltree', methods=['GET', 'POST'])
 def skilltree():
     global skill_tree
     skill_tree = create_skill_tree()
@@ -218,7 +308,10 @@ def skilltree():
     return render_template('skilltree.html', skill_tree_data=skill_tree_data, connections_data=connections_data,
                            activated_skills=activated_skills)
 
-
+@app.before_request
+def clear_session():
+    if not request.path.startswith('/data') | request.path.startswith('/static'):
+        session.clear()
 
 if __name__ == '__main__':
     app.run(debug=True)
