@@ -1,0 +1,29 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endscreen</title>
+    <link rel="stylesheet" href="/static/styles.css">
+
+</head>
+<body>
+    <div class="landing-container">
+        <h1>Endscreen: Are you sure you want to submit?</h1>
+    </div>
+    <div class="button-container">
+        <button type="submit" id="submitButton" class="button next-button">Submit</button>
+        <button id="backButton" class="button back-button">Back</button>
+    </div>
+    <script>
+        document.getElementById('backButton').addEventListener('click', function(event) {
+            window.location.href = "{{ url_for('perkmenu') }}";
+        });
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+
+        });
+    </script>
+</body>
+</html>

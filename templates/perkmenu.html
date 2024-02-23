@@ -7,12 +7,91 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="welcome-container">
-            <h1>Choosing your perks</h1>
-            <a href="{{ url_for('skilltree') }}" class="button back-button">Back</a>
-        </div>
+    <div class="form-container">
+        <form method="post" action="/submit_perkmenu" enctype="multipart/form-data">
+            <div class="welcome-container">
+                <h1>Choosing your perks and tools</h1>
+            </div>
+            <div class="fields-container">
+                <div class="tools-container">
+                    <label for="learned_programs">Learned tools:</label><br>
+                    <input type="text" id="learned_programs" name="learned_programs[]"><br>
 
+                </div>
+                <div class="perks-container">
+                    <label for="hobbys">Hobbys:</label><br>
+                    <input type="text" id="hobbys" name="hobbys[]"><br>
+
+                </div>
+
+            </div>
+
+            <div class="button-container">
+                <button type="submit" id="nextButton" formaction="/submit_perkmenu" class="button next-button">Next</button>
+                <button type="button" id="addPerkButton" class="button">Add Perk</button>
+                <button type="button" id="addToolButton" class="button">Add Tool</button>
+                <button id="backButton" class="button back-button">Back</button>
+            </div>
+        </form>
+    <script>
+        document.getElementById('backButton').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = "{{ url_for('skilltree') }}";
+        });
+
+        document.getElementById('addToolButton').addEventListener('click', function(event) {
+            const newInput = document.createElement('input');
+            newInput.type = 'text'; // Setze den Typ des Eingabefelds
+            newInput.name = 'learned_programs[]'; // Setze den Namen des Eingabefelds
+            newInput.id = 'learned_programs'; // Setze die ID des Eingabefelds
+            const br = document.createElement('br'); // Erstelle ein <br> Element für den Zeilenumbruch
+
+            // Selektiere den Container, in den das neue Feld eingefügt werden soll
+
+
+            // Füge das neue Eingabefeld und den Zeilenumbruch dem Container hinzu
+            document.getElementById('learned_programs').parentNode.appendChild(newInput);
+            document.getElementById('learned_programs').parentNode.appendChild(br);
+        });
+        document.getElementById('addPerkButton').addEventListener('click', function(event) {
+            const newInput = document.createElement('input');
+            newInput.type = 'text'; // Setze den Typ des Eingabefelds
+            newInput.name = 'hobbys[]'; // Setze den Namen des Eingabefelds
+            newInput.id = 'hobbys'; // Setze die ID des Eingabefelds
+            const br = document.createElement('br'); // Erstelle ein <br> Element für den Zeilenumbruch
+
+            // Selektiere den Container, in den das neue Feld eingefügt werden soll
+
+
+            // Füge das neue Eingabefeld und den Zeilenumbruch dem Container hinzu
+            document.getElementById('hobbys').parentNode.appendChild(newInput);
+            document.getElementById('hobbys').parentNode.appendChild(br);
+        });
+
+
+        function addProgramInput() {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'learned_programs[]';
+
+            const br = document.createElement('br');
+
+            document.getElementById('learned_programs').parentNode.appendChild(br);
+            document.getElementById('learned_programs').parentNode.appendChild(input);
+        }
+
+        function addHobbyInput() {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'hobbies[]';
+
+            const br = document.createElement('br');
+
+            document.getElementById('hobbies').parentNode.appendChild(br);
+            document.getElementById('hobbies').parentNode.appendChild(input);
+        }
+
+    </script>
     </div>
 </body>
 </html>

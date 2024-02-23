@@ -6,68 +6,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creating your Character</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
+    <div class="form-container">
         <form method="post" action="/process_character" enctype="multipart/form-data">
             <div class="welcome-container">
                 <h1>Creating your Character</h1>
 
             </div>
             <div class="fields-container">
-                <div class="field">
-                    <input type="text" id="firstName" name="firstName" placeholder="..." value="{{ first_name }}" />
-                    <label for="firstName">First Name</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="lastName" name="lastName" placeholder="..." value="{{ last_name }}" />
-                    <label for="lastName">Last Name</label>
-                </div>
-                <div class="field">
-                    <input type="number" id="age" name="age" placeholder="..." value="{{ age }}" />
-                    <label for="age">Age</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="origin" name="origin" placeholder="..." value="{{ origin }}" />
-                    <label for="origin">Origin</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="knowledge" name="knowledge" placeholder="..." value="{{ knowledge }}" />
-                    <label for="knowledge">Knowledge</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="..." value="{{ phone_number }}" />
-                    <label for="phoneNumber">Phone-Number</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="address" name="address" placeholder="..." value="{{ address }}" />
-                    <label for="address">Address</label>
-                </div>
-                <div class="field">
-                    <input type="text" id="email" name="email" placeholder="..." value="{{ email }}" />
-                    <label for="email">Email</label>
-                </div>
-                <div class="field-radio">
-                    <label>Gender:</label>
-                    <div>
-                        <input type="radio" id="male" name="gender" value="male" {% if session.get('gender') == 'male' %} checked {% endif %}>
-                        <label for="male">Male</label>
+                <div class="fields-column">
+                    <div class="field">
+                        <input type="text" id="firstName" name="firstName" placeholder="..." value="{{ first_name }}" />
+                        <label for="firstName">First Name</label>
                     </div>
-                    <div>
-                        <input type="radio" id="female" name="gender" value="female" {% if session.get('gender') == 'female' %} checked {% endif %}>
-                        <label for="female">Female</label>
+                    <div class="field">
+                        <input type="text" id="lastName" name="lastName" placeholder="..." value="{{ last_name }}" />
+                        <label for="lastName">Last Name</label>
+                    </div>
+                    <div class="field">
+                        <input type="number" id="age" name="age" placeholder="..." value="{{ age }}" min="0"/>
+                        <label for="age">Age</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="country_of_birth" name="country_of_birth" placeholder="..." value="{{ country_of_birth }}" />
+                        <label for="country_of_birth">Country of birth</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="phone" name="phone" placeholder="..." value="{{ phone }}" />
+                        <label for="phone">Phone</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="address" name="address" placeholder="..." value="{{ address }}" />
+                        <label for="address">Address</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="email" name="email" placeholder="..." value="{{ email }}" />
+                        <label for="email">Email</label>
+                    </div>
+
+                    <div class="field-select">
+                        <label for="gender" class="select-label">Gender</label>
+                        <select id="gender" name="gender" class="select-dropdown">
+                            <option value="" disabled selected hidden>Gender</option>
+                            <option value="male" {% if session.get('gender') == 'male' %} selected {% endif %}>Male</option>
+                            <option value="female" {% if session.get('gender') == 'female' %} selected {% endif %}>Female</option>
+                            <option value="other" {% if session.get('gender') == 'other' %} selected {% endif %}>Other</option>
+                        </select>
                     </div>
                 </div>
-            </div>
-            <div class="image-container">
-                <input type="file" id="image-upload" accept="image/*">
-                <label for="image-upload" id="image-upload-label">
-                    <img id="uploaded-image" src="{{ url_for('static', filename='upload.svg') }}" alt="Upload image">
-                </label>
+                <div class="fields-column">
+                    <div class="image-container">
+                        <input type="file" id="image-upload" accept="image/*">
+                        <label for="image-upload" id="image-upload-label">
+                            <img id="uploaded-image" src="{{ url_for('static', filename='upload.svg') }}" alt="Upload image">
+                        </label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="qualification_level" name="qualification_level" placeholder="..." value="{{ qualification_level }}" />
+                        <label for="qualification_level">Qualification level</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" id="job_class" name="job_class" placeholder="..." value="{{ job_class }}" />
+                        <label for="job_class">Job class</label>
+                    </div>
+                </div>
 
             </div>
-            <div class="submit-container">
+
+            <div class="button-container">
                 <button type="submit" formaction="/process_character" class="button next-button">Next</button>
             </div>
         </form>
@@ -75,6 +83,20 @@
     </div>
 
     <script>
+        var ageInput = document.getElementById('age');
+
+        // Add an event listener for input event
+        ageInput.addEventListener('input', function() {
+            // Get the current value of the input
+            var inputValue = parseInt(ageInput.value);
+
+            // Check if the value is negative
+            if (isNaN(inputValue) || inputValue < 0) {
+                // If negative, set the value to 0
+                ageInput.value = 0;
+            }
+        });
+
         document.getElementById('image-upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const image = document.getElementById('uploaded-image');

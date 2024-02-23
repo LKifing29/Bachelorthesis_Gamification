@@ -7,77 +7,81 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <form method="post" action="/" class="skilltree-container">
-    {% for node in skill_tree_data %}
-        {% if node.is_category %}
-        <div class="category-node"
-            data-skill-name="{{node.name}}"
-            data-id="{{node.id}}"
-            data-category="{{node.category}}"
-            data-displayed-site="{{1}}"
-            data-is-displayed="{{1}}"
-            data-parent-id="{{node.parent_id}}"
-            data-is-start-node="{{ node.is_start_node }}"
-            style="left: {{ node.position[0] }}px; top: {{ node.position[1] }}px;">
-            <span>{{ node.name }}</span>
+        <form method="post" action="/process_skilltree" enctype="multipart/form-data" class="skilltree-container">
 
-            <!-- Symbol zum Hinzufügen eines Skills -->
-             <button class="button add-skill-button">+</button>
-            {% for connection in connections_data %}
-                {% if connection.skill_name == node.name %}
-                    <div class="skill-connection"
-                         data-category="{{connection.category}}"
-                         data-skill-name="{{connection.skill_name}}"
-                         style="left: {{ 50 }}px; top: {{ 50 }}px; width: 2px; height: {{ connection.length }}px; transform: rotate({{ connection.angle }}rad);">
+            {% for node in skill_tree_data %}
+            {% if node.is_category %}
+            <div class="category-node"
+                data-skill-name="{{node.name}}"
+                data-id="{{node.id}}"
+                data-category="{{node.category}}"
+                data-displayed-site="{{1}}"
+                data-is-displayed="{{1}}"
+                data-parent-id="{{node.parent_id}}"
+                data-is-start-node="{{ node.is_start_node }}"
+                style="left: {{ node.position[0] }}px; top: {{ node.position[1] }}px;">
+                <span>{{ node.name }}</span>
 
-                    </div>
-                {% endif %}
-            {% endfor %}
-            <div class="buttons-container"> <!-- Container für die Buttons -->
-                <button class="switch-left-button">&lt;</button> <!-- Button für links -->
-                <button class="switch-right-button">&gt;</button> <!-- Button für rechts -->
+                <!-- Symbol zum Hinzufügen eines Skills -->
+                 <button class="button add-skill-button">+</button>
+                {% for connection in connections_data %}
+                    {% if connection.skill_name == node.name %}
+                        <div class="skill-connection"
+                             data-category="{{connection.category}}"
+                             data-skill-name="{{connection.skill_name}}"
+                             style="left: {{ 50 }}px; top: {{ 50 }}px; width: 2px; height: {{ connection.length }}px; transform: rotate({{ connection.angle }}rad);">
+
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="buttons-container"> <!-- Container für die Buttons -->
+                    <button class="switch-left-button">&lt;</button> <!-- Button für links -->
+                    <button class="switch-right-button">&gt;</button> <!-- Button für rechts -->
+                </div>
             </div>
-        </div>
-        {% else %}
-        <div class="skill-node
-             {% if node.is_start_node%}start{% endif %}
-             {% if node.is_category%}category{% endif %}"
-             data-skill-name="{{node.name}}"
-             data-id="{{node.id}}"
-             data-category="{{node.category}}"
-             data-parent-id="{{node.parent_id}}"
-             data-is-custom-node="{{node.is_custom_skill}}"
-             data-is-start-node="{{ node.is_start_node }}"
-             data-is-active="{{ node.is_active }}"
-             data-experience-level="{{ node.experience_level }}"
-             style="left: {{ node.position[0] }}px; top: {{ node.position[1] }}px;">
-            {{ node.name }}
-            {% if not node.is_start_node and not node.is_category %}
-                <span class="experience-display">{{ node.experience_level }}/3</span>
-            {% endif %}
-            {% if node.is_custom_node%}
-                <button class="button delete-skill-button">x</button>
-            {% endif %}
-            <!-- Verbindungslinie als Kindsknoten -->
-            {% for connection in connections_data %}
-                {% if connection.skill_name == node.name %}
-                    <div class="skill-connection"
-                         data-category="{{connection.category}}"
-                         data-skill-name="{{connection.skill_name}}"
-                         style="left: {{ connection.x1 }}px; top: {{ connection.y1 }}px; width: 2px; height: {{ connection.length }}px; transform: rotate({{ connection.angle }}rad);">
-                    </div>
+            {% else %}
+            <div class="skill-node
+                 {% if node.is_start_node%}start{% endif %}
+                 {% if node.is_category%}category{% endif %}
+                 {% if node.is_active%}active{% endif %}"
+                 data-skill-name="{{node.name}}"
+                 data-id="{{node.id}}"
+                 data-category="{{node.category}}"
+                 data-parent-id="{{node.parent_id}}"
+                 data-is-custom-node="{{node.is_custom_skill}}"
+                 data-is-start-node="{{ node.is_start_node }}"
+                 data-is-active="{{ node.is_active }}"
+                 data-experience-level="{{ node.experience_level }}"
+                 style="left: {{ node.position[0] }}px; top: {{ node.position[1] }}px;">
+                {{ node.name }}
+                {% if not node.is_start_node and not node.is_category %}
+                    <span class="experience-display">{{ node.experience_level }}/3</span>
                 {% endif %}
+                {% if node.is_custom_node%}
+                    <button class="button delete-skill-button">x</button>
+                {% endif %}
+                <!-- Verbindungslinie als Kindsknoten -->
+                {% for connection in connections_data %}
+                    {% if connection.skill_name == node.name %}
+                        <div class="skill-connection"
+                             data-category="{{connection.category}}"
+                             data-skill-name="{{connection.skill_name}}"
+                             style="left: {{ connection.x1 }}px; top: {{ connection.y1 }}px; width: 2px; height: {{ connection.length }}px; transform: rotate({{ connection.angle }}rad);">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endfor %}
-        </div>
-        {% endif %}
-    {% endfor %}
 
-        <button type="submit" id="applyButton" class="button submit-button bottom-sticky">Apply</button>
-        <button id="toggleExperienceButton" class="button setting-button bottom-sticky">Toggle Experience Displays</button>
-        <a href="{{ url_for('character') }}" id="backButton" class="button back-button top-sticky">Back</a>
-        <a href="{{ url_for('perkmenu') }}" id="nextButton" class="button next-button top-sticky">Next</a>
+            <div class="button-container">
+                <button type="submit" id="nextButton" formaction="/process_skilltree" class="button next-button">Next</button>
+                <button id="toggleExperienceButton" class="button setting-button">Show Exp</button>
+                <button id="backButton" class="button back-button">Back</button>
+            </div>
 
-    </form>
+        </form>
+
 
     {% if activated_skills %}
         <div id="activatedSkills">
@@ -92,51 +96,51 @@
 
     <script>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const formContainer = document.querySelector('.skilltree-container');
-
-            formContainer.addEventListener('scroll', function() {
-                const topButtons = document.querySelectorAll('.top-sticky');
-                topButtons.forEach(function(button) {
-                    const rect = button.getBoundingClientRect();
-                    const isAtTop = rect.top >= 0;
-
-                    if (!isAtTop) {
-                        button.style.position = 'absolute';
-                        button.style.top = '0';
-                    } else {
-                        button.style.position = 'sticky';
-                        button.style.top = '0';
-                    }
-                    button.style.left = '20' + 'px';
-                });
-
-                const bottomButtons = document.querySelectorAll('.bottom-sticky');
-                bottomButtons.forEach(function(button) {
-                    const rect = button.getBoundingClientRect();
-                    const isAtBottom = rect.bottom <= window.innerHeight;
-
-                    if (!isAtBottom) {
-                        button.style.position = 'absolute';
-                        button.style.bottom = 'auto';
-                        button.style.top = window.innerHeight - rect.height + 'px';
-                    } else {
-                        button.style.position = 'fixed';
-                        button.style.top = 'auto';
-                        button.style.bottom = '0';
-                    }
-                });
-            });
-        });
-
         // Initialisieren des Zählers
         let skillCounter = 1000; // Starten Sie den Zähler bei 1000 oder einer anderen geeigneten Zahl
         document.getElementById('backButton').addEventListener('click', function(event) {
             window.location.href = "{{ url_for('character') }}";
         });
         document.getElementById('nextButton').addEventListener('click', function(event) {
-            window.location.href = "{{ url_for('perkmenu') }}";
+            const skillNodes = document.querySelectorAll('.skill-node:not(.start)');
+            let skillDataArray = [];
+            skillNodes.forEach(function(node) {
+                // Extrahiere die relevanten Daten für jeden Skill
+                let skillData = {
+                    'name': node.dataset.skillName,
+                    'position': [node.style.left, node.style.top],
+                    'id': node.dataset.id,
+                    'parent_id': node.dataset.parentId,
+                    'category': node.dataset.category,
+                    'is_start_node': node.dataset.isStartNode === 'True',
+                    'is_custom_skill': node.dataset.isCustomNode === 'True',
+                    'is_active': node.classList.contains('active'),
+                    'experience_level': node.dataset.experienceLevel
+                };
+                // Füge die extrahierten Daten dem Array hinzu
+                skillDataArray.push(skillData);
+            });
+            sendDataToServer(skillDataArray);
         });
+        function sendDataToServer(skillDataArray) {
+            // Erzeuge ein FormData-Objekt
+            let data = new FormData();
+
+            // Füge das Array mit den Skill-Daten dem FormData-Objekt hinzu
+            data.append('skill_data', JSON.stringify(skillDataArray));
+
+            // Sende die Daten an die process_skilltree-Funktion über einen AJAX-Request
+            fetch('/process_skilltree', {
+                method: 'POST',
+                body: data
+            }).then(response => {
+                window.location.href = "{{ url_for('perkmenu') }}";
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+
+        }
+
 
         document.querySelector('form').addEventListener('click', function(event) {
             if (event.target.classList.contains('skill-node')) {
@@ -168,6 +172,7 @@
                                 if (isActive) {
                                     if (node.dataset.experienceLevel == 1) {
                                         node.dataset.experienceLevel = 0;
+                                        node.dataset.isActive = 'False';
                                         node.classList.remove('active');
                                     } else if (node.dataset.experienceLevel == 2) {
                                         node.dataset.experienceLevel = 1;
@@ -184,6 +189,7 @@
                                     }
                                 } else {
                                     node.classList.add('active');
+                                    node.dataset.isActive = 'True';
                                     node.dataset.experienceLevel = 1;
                                 }
                             }

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
-import os
+import json
 import math
 
 app = Flask(__name__)
@@ -76,6 +76,41 @@ class SkillTree:
             })
         return data
 
+    def get_actual_skill_tree_data(self, stored_skills):
+        print("Genau in der Funktion drinnen")
+        print(stored_skills)
+        print(type(stored_skills))
+        for skill in self.skills:
+            category_name = skill.category.name if skill.category else None
+            parent_id = skill.category.id if skill.category else None
+            if skill.is_start_node:
+                stored_skills.append({
+                    'name': skill.name,
+                    'position': skill.position,
+                    'id': skill.id,
+                    'parent_id': parent_id,
+                    'category': category_name,
+                    'is_start_node': skill.is_start_node,
+                    'is_custom_skill': skill.is_custom_skill,
+                    'is_active': skill.is_active,
+                    'experience_level': skill.experience_level,
+                    'is_category': skill.is_category
+                })
+            if skill.is_category:
+                stored_skills.append({
+                    'name': skill.name,
+                    'position': skill.position,
+                    'id': skill.id,
+                    'parent_id': parent_id,
+                    'category': category_name,
+                    'is_start_node': skill.is_start_node,
+                    'is_custom_skill': skill.is_custom_skill,
+                    'is_active': skill.is_active,
+                    'experience_level': skill.experience_level,
+                    'is_category': skill.is_category
+                })
+        return stored_skills
+
     def get_skill_by_id(self, skill_id):
         for skill in self.skills:
             if skill.id == skill_id:
@@ -109,6 +144,39 @@ class SkillTree:
                 })
 
         return connections
+    def draw_new_connections(self, stored_skills):
+        global category
+        connections = []
+        for skill in stored_skills:
+            if skill['category']:
+                for categorySkill in self.skills:
+                    print(skill['category'])
+                    print(categorySkill.name)
+                    if categorySkill.name == skill['category']:
+                        category = categorySkill
+                        break
+
+                x1 = category.position[0]
+                y1 = category.position[1]
+                position_0 = str(skill['position'][0]).replace("px", "")
+                position_1 = str(skill['position'][1]).replace("px", "")
+                x2 = int(position_0)
+                y2 = int(position_1)
+
+                angle = self.calculate_angle(x1, y1, x2, y2)
+                angle += math.pi
+                distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+                category_name = category.name if category else None
+                connections.append({
+                    'x1': 45,
+                    'y1': 45,
+                    'length': distance,
+                    'angle': angle,
+                    'category': category_name,
+                    'skill_name': skill['name']
+                })
+
+        return connections
 
     @app.route('/toggle_skill/<skill_name>', methods=['POST'])
     def toggle_skill(skill_id):
@@ -134,7 +202,7 @@ def create_skill_tree():
                               is_category=True)
     methodological_skill = Skill('Methodological competence', 5, central_skill, 1, position=(200, 1300),
                                  is_category=True)
-    social_skill = Skill('Social skills', 6, central_skill, 1, position=(1200, 1800),
+    social_skill = Skill('Social skills', 6, central_skill, 1, position=(1200, 1400),
                                        is_category=True)
     others_skill = Skill('Others', 7, central_skill, 1, position=(1200, 950), is_category=True)
     communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(750, 175),
@@ -242,28 +310,29 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/data/character', methods=['GET'])
+@app.route('/character', methods=['GET'])
 def character():
     # Überprüfe, ob die Session-Variablen vorhanden sind
     first_name = session.get('first_name')
     last_name = session.get('last_name')
     age = session.get('age')
-    origin = session.get('origin')
-    knowledge = session.get('knowledge')
-    phone_number = session.get('phoneNumber')
+    country_of_birth = session.get('country_of_birth')
+    qualification_level = session.get('qualification_level')
+    phone = session.get('phone')
     address = session.get('address')
     email = session.get('email')
     gender = session.get('gender')
     image_data = session.get('image_data')
+    job_class = session.get('job_class')
 
     # Gehe sicher, dass "None" nicht in das Template eingesetzt wird
     return render_template('character.html', first_name=first_name or '',
-                           last_name=last_name or '', age=age or '', origin=origin or '',
-                           knowledge=knowledge or '', phone_number=phone_number or '',
+                           last_name=last_name or '', age=age or '', country_of_birth=country_of_birth or '',
+                           qualification_level=qualification_level or '', phone=phone or '',
                            address=address or '', email=email or '', gender=gender or '',
-                           image_data=image_data or '')
+                           image_data=image_data or '', job_class=job_class or '')
 
-@app.route('/data/perkmenu', methods=['GET', 'POST'])
+@app.route('/perkmenu', methods=['GET', 'POST'])
 def perkmenu():
     return render_template('perkmenu.html')
 
@@ -275,43 +344,73 @@ def save_image_data():
 
 @app.route('/process_character', methods=['POST'])
 def process_character():
-    print("test")
     first_name = request.form.get('firstName')
     last_name = request.form.get('lastName')
     age = request.form.get('age')
-    origin = request.form.get('origin')
-    knowledge = request.form.get('knowledge')
-    phone_number = request.form.get('phoneNumber')
+    country_of_birth = request.form.get('country_of_birth')
+    qualification_level = request.form.get('qualification_level')
+    phone = request.form.get('phone')
     address = request.form.get('address')
     email = request.form.get('email')
     gender = request.form.get('gender')
+    job_class = request.form.get('job_class')
     # Speichere die Daten in Session-Variablen
     session['first_name'] = first_name
     session['last_name'] = last_name
     session['age'] = age
-    session['origin'] = origin
-    session['knowledge'] = knowledge
-    session['phone_number'] = phone_number
+    session['country_of_birth'] = country_of_birth
+    session['qualification_level'] = qualification_level
+    session['phone'] = phone
     session['address'] = address
     session['email'] = email
     session['gender'] = gender
+    session['job_class'] = job_class
     return redirect(url_for('skilltree'))
 
-@app.route('/data/skilltree', methods=['GET', 'POST'])
+@app.route('/process_skilltree', methods=['POST'])
+def process_skilltree():
+    stored_skills = []
+    skill_data = request.form.get('skill_data')
+    if skill_data:
+        stored_skills = json.loads(skill_data)
+    session['skills'] = stored_skills
+    print("Skills: ")
+    print(session['skills'])
+    print("Test button")
+    return redirect(url_for('perkmenu'))
+
+@app.route('/endscreen', methods=['GET', 'POST'])
+def endscreen():
+    return render_template('endscreen.html')
+@app.route('/submit_perkmenu', methods=['POST'])
+def submit_perkmenu():
+    return redirect(url_for('endscreen'))
+@app.route('/skilltree', methods=['GET', 'POST'])
 def skilltree():
     global skill_tree
     skill_tree = create_skill_tree()
-    skill_tree_data = skill_tree.get_skill_tree_data()
-    connections_data = skill_tree.draw_connections()
+    if request.method == 'POST':  # Daten aktualisieren
+        stored_skills = request.form.get('skill_data')
+        session['skills'] = stored_skills
+        return redirect(url_for('skilltree'))
+    if session.get('skills') is not None:
+        print("Wäre geil wenns klappt")
+        stored_skills = session.get('skills')
+        print(stored_skills)
+        print("Teststststst")
+        new_skill_tree_data = skill_tree.get_actual_skill_tree_data(stored_skills)
+        new_connections_data = skill_tree.draw_new_connections(stored_skills)
+        return render_template('skilltree.html', skill_tree_data=new_skill_tree_data, connections_data=new_connections_data)
+    else:
+        print("Hier ist alles normal oder?")
 
-    activated_skills = [skill.name for skill in skill_tree.skills if skill.is_active]
+        skill_tree_data = skill_tree.get_skill_tree_data()
+        connections_data = skill_tree.draw_connections()
+
+        activated_skills = [skill.name for skill in skill_tree.skills if skill.is_active]
     return render_template('skilltree.html', skill_tree_data=skill_tree_data, connections_data=connections_data,
                            activated_skills=activated_skills)
 
-@app.before_request
-def clear_session():
-    if not request.path.startswith('/data') | request.path.startswith('/static'):
-        session.clear()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
