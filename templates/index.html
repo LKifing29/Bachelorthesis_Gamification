@@ -12,7 +12,16 @@
 <body>
     <div class="landing-container">
         <h1>Welcome to the application generator</h1>
-        <a href="{{ url_for('character') }}" class="button next-button">Next</a>
+    <div class="container">
+        <button type="submit" id="nextButton" class="button next-button">Next</button>
     </div>
+
+
+    </div>
+    <script>
+        document.getElementById('nextButton').addEventListener('click', function(event) {
+            window.location.href = "{{ url_for('character') }}";
+        });
+    </script>
 </body>
 </html>

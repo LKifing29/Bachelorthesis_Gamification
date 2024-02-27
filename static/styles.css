@@ -97,10 +97,17 @@ form.skilltree-container {
     text-align: center;
 }
 .landing-container {
-    width: 100%;
-
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: #3E3E3E;
+    padding: 30px;
+    box-shadow: 0px 0px 10px 20px #00B2C4;
+    border-radius: 20px;
     margin-bottom: 20px;
     text-align: center;
+    gap: 50px;
 }
 
 /* Experience */
@@ -134,8 +141,7 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    padding-top: 20px;
+    margin-bottom: 30px;
     color: white;
 }
 .form-container {
@@ -375,6 +381,49 @@ body {
 }
 .skill-node:hover .delete-skill-button {
     display: inline-block; /* Der Button wird angezeigt, wenn die Kategorie mit der Maus überfahren wird */
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    top: 10px;
+    background-image: url('/static/info-circle.svg'); /* Hier den Pfad zum Icon-Bild einfügen */
+    cursor: pointer;
+    position: relative; /* Erforderlich für die Positionierung des Tooltip-Inhalts */
+    background-color: white;
+    border-radius: 90px;
+}
+
+.info-icon:hover .tooltip {
+    display: block; /* Zeigt die Tooltip-Box an, wenn das Icon gehovert wird */
+}
+
+.tooltip {
+    display: none; /* Versteckt die Tooltip-Box standardmäßig */
+    position: absolute;
+    bottom: calc(100% + 5px); /* Positioniert die Tooltip-Box unterhalb des Icons */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 999;
+    width: 200px; /* Breite der Tooltip-Box anpassen */
+
+}
+
+/* Optional: Pfeil für die Tooltip-Box */
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
 
 

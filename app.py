@@ -1,7 +1,11 @@
+import atexit
+
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 import json
 import math
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -77,9 +81,7 @@ class SkillTree:
         return data
 
     def get_actual_skill_tree_data(self, stored_skills):
-        print("Genau in der Funktion drinnen")
         print(stored_skills)
-        print(type(stored_skills))
         for skill in self.skills:
             category_name = skill.category.name if skill.category else None
             parent_id = skill.category.id if skill.category else None
@@ -150,8 +152,6 @@ class SkillTree:
         for skill in stored_skills:
             if skill['category']:
                 for categorySkill in self.skills:
-                    print(skill['category'])
-                    print(categorySkill.name)
                     if categorySkill.name == skill['category']:
                         category = categorySkill
                         break
@@ -205,7 +205,7 @@ def create_skill_tree():
     social_skill = Skill('Social skills', 6, central_skill, 1, position=(1200, 1400),
                                        is_category=True)
     others_skill = Skill('Others', 7, central_skill, 1, position=(1200, 950), is_category=True)
-    communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(750, 175),
+    communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(750, 200),
                                 is_category=True)
     project_management_skill = Skill('Project management', 9, central_skill, 1, position=(200, 575),
                                 is_category=True)
@@ -315,7 +315,7 @@ def character():
     # Überprüfe, ob die Session-Variablen vorhanden sind
     first_name = session.get('first_name')
     last_name = session.get('last_name')
-    age = session.get('age')
+    birth_date = session.get('birth_date')
     country_of_birth = session.get('country_of_birth')
     qualification_level = session.get('qualification_level')
     phone = session.get('phone')
@@ -327,14 +327,17 @@ def character():
 
     # Gehe sicher, dass "None" nicht in das Template eingesetzt wird
     return render_template('character.html', first_name=first_name or '',
-                           last_name=last_name or '', age=age or '', country_of_birth=country_of_birth or '',
+                           last_name=last_name or '', birth_date=birth_date or '', country_of_birth=country_of_birth or '',
                            qualification_level=qualification_level or '', phone=phone or '',
                            address=address or '', email=email or '', gender=gender or '',
                            image_data=image_data or '', job_class=job_class or '')
 
 @app.route('/perkmenu', methods=['GET', 'POST'])
 def perkmenu():
-    return render_template('perkmenu.html')
+    tool_data = session.get('tool_data')
+    hobbys = session.get('hobbys')
+
+    return render_template('perkmenu.html', tool_data=tool_data or '', hobbys=hobbys or '')
 
 @app.route('/save_image_data', methods=['POST'])
 def save_image_data():
@@ -346,7 +349,7 @@ def save_image_data():
 def process_character():
     first_name = request.form.get('firstName')
     last_name = request.form.get('lastName')
-    age = request.form.get('age')
+    birth_date = request.form.get('birthDate')
     country_of_birth = request.form.get('country_of_birth')
     qualification_level = request.form.get('qualification_level')
     phone = request.form.get('phone')
@@ -357,7 +360,7 @@ def process_character():
     # Speichere die Daten in Session-Variablen
     session['first_name'] = first_name
     session['last_name'] = last_name
-    session['age'] = age
+    session['birth_date'] = birth_date
     session['country_of_birth'] = country_of_birth
     session['qualification_level'] = qualification_level
     session['phone'] = phone
@@ -374,9 +377,6 @@ def process_skilltree():
     if skill_data:
         stored_skills = json.loads(skill_data)
     session['skills'] = stored_skills
-    print("Skills: ")
-    print(session['skills'])
-    print("Test button")
     return redirect(url_for('perkmenu'))
 
 @app.route('/endscreen', methods=['GET', 'POST'])
@@ -384,26 +384,41 @@ def endscreen():
     return render_template('endscreen.html')
 @app.route('/submit_perkmenu', methods=['POST'])
 def submit_perkmenu():
+    tool_data = request.form.get('learned_programs')
+    hobby_data = request.form.get('hobbys')
+    session['tool_data'] = tool_data
+    session['hobbys'] = hobby_data
     return redirect(url_for('endscreen'))
+
+@app.route('/create_pdf')
+def create_pdf():
+    clear_session_at_exit()
+    character_name = session.get('firstName')
+        # Erstelle ein neues PDF-Dokument
+    c = canvas.Canvas("output.pdf", pagesize=letter)
+
+    # Füge die gesammelten Informationen in das PDF-Dokument ein
+    c.drawString(100, 700, "Character Information:")
+    c.drawString(100, 680, f"Name: {character_name}")
+
+    c.drawString(100, 620, "Skilltree Information:")
+
+    c.drawString(100, 560, "Perkmenu Information:")
+
+    # Speichere und schließe das PDF-Dokument
+    c.save()
+
+    return "PDF erstellt"
 @app.route('/skilltree', methods=['GET', 'POST'])
 def skilltree():
     global skill_tree
     skill_tree = create_skill_tree()
-    if request.method == 'POST':  # Daten aktualisieren
-        stored_skills = request.form.get('skill_data')
-        session['skills'] = stored_skills
-        return redirect(url_for('skilltree'))
     if session.get('skills') is not None:
-        print("Wäre geil wenns klappt")
         stored_skills = session.get('skills')
-        print(stored_skills)
-        print("Teststststst")
         new_skill_tree_data = skill_tree.get_actual_skill_tree_data(stored_skills)
         new_connections_data = skill_tree.draw_new_connections(stored_skills)
         return render_template('skilltree.html', skill_tree_data=new_skill_tree_data, connections_data=new_connections_data)
     else:
-        print("Hier ist alles normal oder?")
-
         skill_tree_data = skill_tree.get_skill_tree_data()
         connections_data = skill_tree.draw_connections()
 
@@ -411,6 +426,9 @@ def skilltree():
     return render_template('skilltree.html', skill_tree_data=skill_tree_data, connections_data=connections_data,
                            activated_skills=activated_skills)
 
+def clear_session_at_exit():
+    session.clear()
+    print("Session cleared at program exit")
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skill Tree</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/hyphenopoly@2.7.0/dist/hyphenopoly.module.js"></script>
 </head>
 <body>
         <form method="post" action="/process_skilltree" enctype="multipart/form-data" class="skilltree-container">
@@ -57,7 +58,7 @@
                 {% if not node.is_start_node and not node.is_category %}
                     <span class="experience-display">{{ node.experience_level }}/3</span>
                 {% endif %}
-                {% if node.is_custom_node%}
+                {% if node.is_custom_skill %}
                     <button class="button delete-skill-button">x</button>
                 {% endif %}
                 <!-- Verbindungslinie als Kindsknoten -->
@@ -76,10 +77,16 @@
 
             <div class="button-container">
                 <button type="submit" id="nextButton" formaction="/process_skilltree" class="button next-button">Next</button>
+                <div class="info-icon">
+                    <div class="tooltip">
+                        <p>Upvote skill: Left-Click</p>
+                        <p>Downvote skill: Ctrl + Left-Click</p>
+                        <p>Click on Category: Show / Hide skills</p>
+                    </div>
+                </div>
                 <button id="toggleExperienceButton" class="button setting-button">Show Exp</button>
                 <button id="backButton" class="button back-button">Back</button>
             </div>
-
         </form>
 
 
@@ -224,7 +231,23 @@
             function addSkillToCategory(categoryNode) {
                 console.log("AddSkill");
                 event.preventDefault();
-                const skillName = prompt('Enter a name for the new skill:');
+                let skillName = prompt('Enter a name for the new skill:');
+                if (skillName.length > 25) {
+                    alert('Skill name is too long. Please enter a name with at most 25 characters.');
+                    return;
+                } else {
+                    // Fügen Sie einen Zeilenumbruch nach 13 Zeichen ein, wenn der Skillname länger ist
+                    if (skillName.length > 13) {
+                        let modifiedSkillName = '';
+                        for (let i = 0; i < skillName.length; i++) {
+                            modifiedSkillName += skillName[i];
+                            if ((i + 1) % 13 === 0 && i + 1 !== skillName.length) {
+                                modifiedSkillName += ' ';
+                            }
+                        }
+                        skillName = modifiedSkillName; // Hier können Sie modifiedSkillName verwenden, um den angepassten Skillnamen zu verwenden
+                    }
+                }
 
                 if (skillName) {
                     const newSkillNode = document.createElement('div');
@@ -240,6 +263,8 @@
 
                     const parentId = categoryNode.dataset.id;
                     newSkillNode.setAttribute('data-parent-id', parentId);
+
+                    newSkillNode.setAttribute('data-is-custom-node', 'True')
 
                     newSkillNode.setAttribute('data-experience-level', 0);
 

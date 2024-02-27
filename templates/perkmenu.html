@@ -8,20 +8,18 @@
 </head>
 <body>
     <div class="form-container">
-        <form method="post" action="/submit_perkmenu" enctype="multipart/form-data">
+        <form autocomplete="off" method="post" action="/submit_perkmenu" enctype="multipart/form-data">
             <div class="welcome-container">
                 <h1>Choosing your perks and tools</h1>
             </div>
             <div class="fields-container">
                 <div class="tools-container">
-                    <label for="learned_programs">Learned tools:</label><br>
-                    <input type="text" id="learned_programs" name="learned_programs[]"><br>
-
+                    <label for="learned_programs">Learned tools</label><br>
+                    <textarea id="learned_programs" style="resize: none;" name="learned_programs" rows="10" cols="30">{{ tool_data }}</textarea><br>
                 </div>
                 <div class="perks-container">
-                    <label for="hobbys">Hobbys:</label><br>
-                    <input type="text" id="hobbys" name="hobbys[]"><br>
-
+                    <label for="hobbys">Hobbys</label><br>
+                    <textarea id="hobbys" style="resize: none;" name="hobbys" rows="10" cols="30">{{ hobbys }}</textarea><br>
                 </div>
 
             </div>
@@ -42,8 +40,8 @@
         document.getElementById('addToolButton').addEventListener('click', function(event) {
             const newInput = document.createElement('input');
             newInput.type = 'text'; // Setze den Typ des Eingabefelds
-            newInput.name = 'learned_programs[]'; // Setze den Namen des Eingabefelds
             newInput.id = 'learned_programs'; // Setze die ID des Eingabefelds
+            newInput.name = 'learned_programs[]'; // Setze den Namen des Eingabefelds
             const br = document.createElement('br'); // Erstelle ein <br> Element für den Zeilenumbruch
 
             // Selektiere den Container, in den das neue Feld eingefügt werden soll
@@ -55,12 +53,10 @@
         });
         document.getElementById('addPerkButton').addEventListener('click', function(event) {
             const newInput = document.createElement('input');
+            newInput.id = 'hobbys'; // Setze die ID des Eingabefelds
             newInput.type = 'text'; // Setze den Typ des Eingabefelds
             newInput.name = 'hobbys[]'; // Setze den Namen des Eingabefelds
-            newInput.id = 'hobbys'; // Setze die ID des Eingabefelds
             const br = document.createElement('br'); // Erstelle ein <br> Element für den Zeilenumbruch
-
-            // Selektiere den Container, in den das neue Feld eingefügt werden soll
 
 
             // Füge das neue Eingabefeld und den Zeilenumbruch dem Container hinzu
