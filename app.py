@@ -1,16 +1,25 @@
-import atexit
+import io
+import os
+import random
+import shutil
 
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 import json
 import math
+from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from flask import make_response
+from werkzeug.utils import secure_filename
+from reportlab.lib.units import inch
 
 app = Flask(__name__)
 app.secret_key = 'test'
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'temp_uploads')
+app.config['UPLOAD_FOLDER'] = 'static/temp_uploads'
 
 class Skill:
     def __init__(self, name, id=None, category=None, parent_id=None, position=(0, 0), is_start_node=False, is_custom_skill=False, is_category = False ):
@@ -193,23 +202,23 @@ def create_skill_tree():
 
     # Create skills
     # <editor-fold desc="Create skills">
-    central_skill = Skill('Skills', 1, position=(750, 500), is_start_node=True)
+    central_skill = Skill('My Skills', 1, position=(600, 500), is_start_node=True)
     leadership_skill = Skill('Leadership', 2, central_skill, 1, position=(200, 200),
                              is_category=True)
     design_skill = Skill('Design', 3, central_skill,  1, position=(200, 950),
                          is_category=True)
-    programming_skill = Skill('Programming', 4, central_skill, 1, position=(1200, 200),
+    programming_skill = Skill('Programming', 4, central_skill, 1, position=(1000, 200),
                               is_category=True)
     methodological_skill = Skill('Methodological competence', 5, central_skill, 1, position=(200, 1300),
                                  is_category=True)
-    social_skill = Skill('Social skills', 6, central_skill, 1, position=(1200, 1400),
+    social_skill = Skill('Social skills', 6, central_skill, 1, position=(1000, 1400),
                                        is_category=True)
-    others_skill = Skill('Others', 7, central_skill, 1, position=(1200, 950), is_category=True)
-    communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(750, 200),
+    others_skill = Skill('Others', 7, central_skill, 1, position=(600, 200), is_category=True)
+    communication_skill = Skill('Communication competence', 8, central_skill, 1, position=(1000, 950),
                                 is_category=True)
     project_management_skill = Skill('Project management', 9, central_skill, 1, position=(200, 575),
                                 is_category=True)
-    personal_skill = Skill('Personal skills', 10, central_skill, 1, position=(1200, 575),
+    personal_skill = Skill('Personal skills', 10, central_skill, 1, position=(1000, 575),
                                 is_category=True)
 
     photoshop_skill = Skill('Photoshop', 31, design_skill, 3, position=(425, 300))
@@ -225,7 +234,7 @@ def create_skill_tree():
     listening_skill = Skill('Active listening', 41, communication_skill, 8)
     integrity_skill = Skill('Integrity', 42, leadership_skill, 2, position=(100, 100))
     flexibility_skill = Skill('Flexibility', 43, leadership_skill, 2, position=(300, 300))
-    criticism_skill = Skill('Express criticism', 44, leadership_skill, 2, position=(100, 300))
+    criticism_skill = Skill('Express criticism', 44, personal_skill, 10, position=(100, 300))
     time_management_skill = Skill('Time management', 45, project_management_skill, 9)
     prioritization_skill = Skill('Prioritization', 46, methodological_skill, 5)
     negotiation_technique_skill = Skill('Negotiation technique', 47, methodological_skill, 5)
@@ -238,25 +247,39 @@ def create_skill_tree():
     communication_with_others_skill = Skill('Communication', 54, communication_skill, 8)
     inspire_skill = Skill('Inspire others', 55, communication_skill, 8)
     change_willingness_skill = Skill('Willingness to change', 57, leadership_skill, 2)
-    trust_skill = Skill('Trust', 58, leadership_skill, 2)
-    trust_skill = Skill('Trust', 59, leadership_skill, 2)
+    thinking_skill = Skill('Entrepreneurial thinking', 58, leadership_skill, 2)
+    decision_skill = Skill('Joy of decision-making', 59, leadership_skill, 2)
     trust_skill = Skill('Trust', 60, leadership_skill, 2)
-
     problem_solving_skill = Skill('Problem solving', 61, project_management_skill, 9)
     analytic_thinking_skill = Skill('Analytic thinking', 62, project_management_skill, 9)
     building_teams_skill = Skill('Building teams', 63, project_management_skill, 9)
-    lateral_leading_skill = Skill('Lateral leading', 64, project_management_skill, 9)
-
-
-
-
-
-
+    methods_skill = Skill('Project management methods', 64, project_management_skill, 9)
+    tools_skill = Skill('Project management tools', 67, project_management_skill, 9)
+    lateral_leading_skill = Skill('Lateral leading', 68, project_management_skill, 9)
+    critical_ability_skill = Skill('Critical ability', 65, personal_skill, 10)
+    motivational_ability_skill = Skill('Motivational ability', 66, leadership_skill, 2)
+    loyalty_skill = Skill('Loyalty', 69, personal_skill, 10)
+    learn_skill = Skill('Willingness to learn', 70, personal_skill, 10)
+    structured_working_skill = Skill('Structured working', 71, personal_skill, 10)
+    goal_orientation_skill = Skill('Goal orientation', 72, personal_skill, 10)
+    quick_perception_skill = Skill('Quick perception', 73, personal_skill, 10)
 
     # </editor-fold>
 
     # Add skills
     # <editor-fold desc="Add skills to the tree">
+    skill_tree.add_skill(learn_skill)
+    skill_tree.add_skill(structured_working_skill)
+    skill_tree.add_skill(goal_orientation_skill)
+    skill_tree.add_skill(quick_perception_skill)
+    skill_tree.add_skill(loyalty_skill)
+    skill_tree.add_skill(thinking_skill)
+    skill_tree.add_skill(decision_skill)
+    skill_tree.add_skill(methods_skill)
+    skill_tree.add_skill(tools_skill)
+    skill_tree.add_skill(critical_ability_skill)
+    skill_tree.add_skill(motivational_ability_skill)
+
     skill_tree.add_skill(change_willingness_skill)
     skill_tree.add_skill(trust_skill)
     skill_tree.add_skill(problem_solving_skill)
@@ -303,10 +326,21 @@ def create_skill_tree():
 
     return skill_tree
 
+global random_username
+
+def create_user_folder():
+    print("Test create folder")
+    random_user = random.randint(1, 10000000)
+    random_username = str(random_user)
+
+    print("Randomuser: " + random_username)
+    user_folder = base_dir + "/static/temp_uploads/" + random_username
+    if not os.path.exists(user_folder):
+        os.makedirs(user_folder)
+    return random_username
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
     return render_template('index.html')
 
 
@@ -317,20 +351,17 @@ def character():
     last_name = session.get('last_name')
     birth_date = session.get('birth_date')
     country_of_birth = session.get('country_of_birth')
-    qualification_level = session.get('qualification_level')
     phone = session.get('phone')
     address = session.get('address')
     email = session.get('email')
     gender = session.get('gender')
-    image_data = session.get('image_data')
-    job_class = session.get('job_class')
+    image_name = session.get('image_name')
 
     # Gehe sicher, dass "None" nicht in das Template eingesetzt wird
     return render_template('character.html', first_name=first_name or '',
                            last_name=last_name or '', birth_date=birth_date or '', country_of_birth=country_of_birth or '',
-                           qualification_level=qualification_level or '', phone=phone or '',
-                           address=address or '', email=email or '', gender=gender or '',
-                           image_data=image_data or '', job_class=job_class or '')
+                           phone=phone or '', address=address or '', email=email or '', gender=gender or '',
+                           image_name=image_name or '')
 
 @app.route('/perkmenu', methods=['GET', 'POST'])
 def perkmenu():
@@ -339,36 +370,82 @@ def perkmenu():
 
     return render_template('perkmenu.html', tool_data=tool_data or '', hobbys=hobbys or '')
 
+@app.route('/cv', methods=['GET', 'POST'])
+def cv():
+    resume_entries = session.get('resume')
+    return render_template('cv.html', resume_entries=resume_entries or '')
+
 @app.route('/save_image_data', methods=['POST'])
 def save_image_data():
-    image_data = request.json.get('image_data')
-    session['image_data'] = image_data
-    return 'Bild erfolgreich gespeichert.', 200
+    print("Test image")
+    if 'image' not in request.files:
+        print("Erste Abrage")
+        return 'No file part', 400
 
+    file = request.files['image']
+    if file.filename == '':
+        print("Zweite Abfrage")
+        return 'No selected file', 400
+
+    user_folder = create_user_folder()
+    print("Test folder" + user_folder)
+    filename = secure_filename(file.filename)
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    print(image_path)
+    new_image_path = image_path.replace('\\', '/')
+    print(new_image_path)
+    print(filename)
+    session['user_folder'] = user_folder
+    temp_image_path = base_dir + "/static/temp_uploads/" + user_folder + "/" + filename
+    print("Testweise ob der Pfad stimmt: " + temp_image_path)
+    file.save(temp_image_path)
+    session['image_name'] = filename  # Speichern Sie den Dateinamen in der Sitzung
+    print("Ist schonmal besser")
+    return 'Bild erfolgreich hochgeladen.', 200
+
+@app.route('/process_cv', methods=['POST'])
+def process_cv():
+    from_dates = request.form.getlist('from_date[]')
+    to_dates = request.form.getlist('to_date[]')
+    locations = request.form.getlist('location[]')
+    descriptions = request.form.getlist('description[]')
+
+    # Erstelle eine Liste von Einträgen für den Lebenslauf
+    resume_entries = []
+    for from_date, to_date, location, description in zip(from_dates, to_dates, locations, descriptions):
+        entry = {
+            'from_date': from_date,
+            'to_date': to_date,
+            'location': location,
+            'description': description
+        }
+        resume_entries.append(entry)
+
+    # Speichere die Lebenslauf-Einträge in der Session
+    session['resume'] = resume_entries
+
+    # Umleitung zur Seite für den Lebenslauf oder wo auch immer Sie hin möchten
+    return redirect(url_for('skilltree'))
 @app.route('/process_character', methods=['POST'])
 def process_character():
     first_name = request.form.get('firstName')
     last_name = request.form.get('lastName')
     birth_date = request.form.get('birthDate')
     country_of_birth = request.form.get('country_of_birth')
-    qualification_level = request.form.get('qualification_level')
     phone = request.form.get('phone')
     address = request.form.get('address')
     email = request.form.get('email')
     gender = request.form.get('gender')
-    job_class = request.form.get('job_class')
     # Speichere die Daten in Session-Variablen
     session['first_name'] = first_name
     session['last_name'] = last_name
     session['birth_date'] = birth_date
     session['country_of_birth'] = country_of_birth
-    session['qualification_level'] = qualification_level
     session['phone'] = phone
     session['address'] = address
     session['email'] = email
     session['gender'] = gender
-    session['job_class'] = job_class
-    return redirect(url_for('skilltree'))
+    return redirect(url_for('cv'))
 
 @app.route('/process_skilltree', methods=['POST'])
 def process_skilltree():
@@ -392,23 +469,168 @@ def submit_perkmenu():
 
 @app.route('/create_pdf')
 def create_pdf():
-    clear_session_at_exit()
-    character_name = session.get('firstName')
-        # Erstelle ein neues PDF-Dokument
-    c = canvas.Canvas("output.pdf", pagesize=letter)
-
+    # Erstelle ein neues PDF-Dokument
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    x = 100
+    y = 750
     # Füge die gesammelten Informationen in das PDF-Dokument ein
-    c.drawString(100, 700, "Character Information:")
-    c.drawString(100, 680, f"Name: {character_name}")
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(x, y, "Applicant Information")
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Name: ')
+    c.setFont('Helvetica', 12)
+    c.drawString(x + 170, y, f'{session.get("first_name")} {session.get("last_name")}')
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Date and location of birth: ')
+    c.setFont('Helvetica', 12)
+    c.drawString(x + 170, y, f'{session.get("birth_date")} {session.get("country_of_birth")}')
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Phone: ')
+    c.setFont('Helvetica', 12)
+    c.drawString(x + 170, y, f'{session.get("phone")}')
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Address: ')
+    c.setFont('Helvetica', 12)
+    c.drawString(x + 170, y, f'{session.get("address")}')
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Email: ')
+    c.setFont('Helvetica', 12)
+    c.drawString(x + 170, y, f'{session.get("email")}')
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(x, y, f'Gender: ')
+    c.setFont('Helvetica', 12)
+    if session.get("gender") != None:
+        c.drawString(x + 170, y, f'{session.get("gender")}')
+    y -= 40
+    filename = session.get('image_name')
+    user_folder = session.get('user_folder')
+    if filename != None and user_folder != None:
+        image_path = base_dir + "/static/temp_uploads/" + user_folder + "/" + filename
+        c.drawImage(image_path, 450, 600, width=1.7 * inch, height=2.25 * inch)
 
-    c.drawString(100, 620, "Skilltree Information:")
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(x, y, "Curriculum vitae")
+    y -= 20
+    c.setFont('Helvetica', 12)
+    table_headers = ["From", "To", "Location", "Description"]
+    resume_entries = session.get('resume', [])
+    col_width = 80
+    c.setFont('Helvetica-Bold', 12)
+    for i, header in enumerate(table_headers):
+        c.drawString(x + i * col_width, y, header)
+    c.setFont('Helvetica', 12)
+    for entry in resume_entries:
+        if entry['description'] != '':
+            y -= 20
+            c.drawString(x, y, entry['from_date'])
+            c.drawString(x + col_width, y, entry['to_date'])
+            c.drawString(x + 2 * col_width, y, entry['location'])
+            c.drawString(x + 3 * col_width, y, entry['description'])
+            if y < 50:
+                c.showPage()  # Beginne eine neue Seite
+                y = 750  # Setze die y-Position für die neue Seite
 
-    c.drawString(100, 560, "Perkmenu Information:")
+    y -= 40
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(x, y, "Skilltree Information")
+    y -= 20
+    c.setFont('Helvetica', 12)
+    skills = session.get('skills')
+    # Zeichne die Daten in das PDF-Dokument
+    line_height = 14  # Zeilenhöhe
+    max_width = 400  # Maximale Breite des Textbereichs
+    for skill in skills:
+        if skill['is_active']:
+            skill_name = skill['name']
+            c.drawString(x, y, f"Skillname: {skill_name}")
 
-    # Speichere und schließe das PDF-Dokument
+            # Zeichne das Erfahrungsniveau des Skills
+            experience_level = skill['experience_level']
+            c.drawString(x + 300, y, f"Experience Level: {experience_level}/3")
+
+            # Aktualisiere die y-Position für den nächsten Skill
+            y -= line_height
+            if y < 50:
+                c.showPage()  # Beginne eine neue Seite
+                y = 750  # Setze die y-Position für die neue Seite
+
+    def wrap_text(text, max_width):
+        lines = []
+        line = ''
+        words = text.split()
+        for i, word in enumerate(words):
+            if c.stringWidth(line + word, 'Helvetica', 12) < max_width:
+                # Füge das Wort mit einem Komma und einem Leerzeichen hinzu, außer beim ersten Wort
+                if line:
+                    line += ', ' + word
+                else:
+                    line += word
+            else:
+                lines.append(line)
+                line = word
+        lines.append(line)  # Füge die letzte Zeile hinzu
+        return lines
+
+    # Zeichne Learned Tools
+    y -= 16
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(x, y, "Learned Tools")
+    c.setFont('Helvetica', 12)
+    y -= line_height
+    tool_data = session.get('tool_data', [])
+    for line in wrap_text(tool_data, max_width):
+        c.drawString(x + 20, y, line)
+        y -= line_height
+        if y < 50:
+            c.showPage()  # Beginne eine neue Seite
+            y = 750  # Setze die y-Position für die neue Seite
+
+    # Zeichne Hobbys
+    y-= 6
+    c.setFont('Helvetica-Bold', 16)
+    c.drawString(x, y, "Hobbys")
+    c.setFont('Helvetica', 12)
+    y -= line_height
+    hobby_data = session.get('hobbys', [])
+    print(hobby_data)
+    for line in wrap_text(hobby_data, max_width):
+        c.drawString(x + 20, y, line)
+        y -= line_height
+        if y < 50:
+            c.showPage()  # Beginne eine neue Seite
+            y = 750  # Setze die y-Position für die neue Seite
+
+    # Save and close pdf
     c.save()
 
-    return "PDF erstellt"
+    # Clear uploaded images
+    if user_folder != None:
+        folder_path = base_dir + "/static/temp_uploads/" + user_folder
+        try:
+            shutil.rmtree(folder_path)
+            print(f"Deleted folder and its contents: {folder_path}")
+        except Exception as e:
+            print(f"Error deleting folder {folder_path}: {e}")
+
+    buffer.seek(0)
+
+    response = make_response(buffer.read())
+    first_name_l = session.get("first_name").lower()
+    last_name_l = session.get("last_name").lower()
+    current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    filename = f'application_{first_name_l}_{last_name_l}_{current_datetime}.pdf'
+    response.mimetype = 'application/pdf'
+    response.headers['Content-Disposition'] = f'inline; filename={filename}'
+
+    clear_session_at_exit()
+    return response
 @app.route('/skilltree', methods=['GET', 'POST'])
 def skilltree():
     global skill_tree

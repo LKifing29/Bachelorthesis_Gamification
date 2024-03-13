@@ -101,7 +101,7 @@ form.skilltree-container {
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    background-color: #3E3E3E;
+    background-color: #656565;
     padding: 30px;
     box-shadow: 0px 0px 10px 20px #00B2C4;
     border-radius: 20px;
@@ -149,10 +149,11 @@ body {
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    background-color: #3E3E3E;
+    background-color: #656565;
     padding: 30px;
-    box-shadow: 0px 0px 10px 20px #00B2C4;
+    box-shadow: 0px 0px 7px 10px #00B2C4;
     border-radius: 20px;
+    margin-bottom: 50px;
 }
 .fields-container {
     display: flex;
@@ -178,6 +179,7 @@ body {
     justify-content: center;
     align-items: center;
     margin-bottom: 37px;
+    margin-right: 20px;
 }
 
 #image-upload-label {
@@ -201,7 +203,7 @@ body {
 
 .field {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 .field-select {
     display: flex;
@@ -223,7 +225,7 @@ body {
     top: 0;
     left: 0;
     translate: 0.625rem 0.625rem;
-    color: #00B2C4;
+    color: #000000;
     background-color: transparent;
     padding-inline: 0 0.25rem;
     pointer-events: none;
@@ -251,7 +253,7 @@ body {
 .field-select .select-label {
     position: absolute;
     translate: 0.2rem -1.7rem;
-    color: #00B2C4;
+    color: #000000;
     background-color: transparent;
     padding: 0 0.25rem;
     border-radius: 5px;
@@ -386,10 +388,11 @@ body {
 .info-icon {
     width: 40px;
     height: 40px;
-    top: 10px;
+    left: 20px;
+    top: 20px;
     background-image: url('/static/info-circle.svg'); /* Hier den Pfad zum Icon-Bild einfügen */
     cursor: pointer;
-    position: relative; /* Erforderlich für die Positionierung des Tooltip-Inhalts */
+    position: fixed; /* Erforderlich für die Positionierung des Tooltip-Inhalts */
     background-color: white;
     border-radius: 90px;
 }
@@ -400,9 +403,9 @@ body {
 
 .tooltip {
     display: none; /* Versteckt die Tooltip-Box standardmäßig */
-    position: absolute;
-    bottom: calc(100% + 5px); /* Positioniert die Tooltip-Box unterhalb des Icons */
-    left: 50%;
+    position: relative;
+    top: calc(100% + 5px); /* Positioniert die Tooltip-Box unterhalb des Icons */
+    left: 100px;
     transform: translateX(-50%);
     background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
@@ -424,6 +427,20 @@ body {
     border-width: 5px;
     border-style: solid;
     border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+/* Media Query für Bildschirmhöhe */
+@media screen and (max-height: 800px) {
+  /* Stile für alle Felder auf der Seite */
+  .field input[type="text"],
+  .field input[type="date"],
+  .field input[type="email"],
+  .field input[type="tel"],
+  .field select {
+    padding: 0.5em; /* Reduziert den Padding um 50% */
+    font-size: 0.8em; /* Reduziert die Schriftgröße um 20% */
+    /* Fügen Sie weitere Stile hinzu, die Sie anpassen möchten */
+  }
 }
 
 

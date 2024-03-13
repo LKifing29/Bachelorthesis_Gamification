@@ -1,0 +1,81 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cv</title>
+    <link rel="stylesheet" href="/static/styles.css">
+
+</head>
+<body>
+    <div class="form-container">
+        <div class="welcome-container">
+            <h1>Curriculum vitae</h1>
+        </div>
+        <form autocomplete="off" method="post" action="/process_cv" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                </tr>
+                {% if 'resume' in session %}
+                    {% for entry in session.get('resume', []) %}
+                    <tr>
+                        <td><input type="text" name="from_date[]" value="{{ entry.from_date }}" size="8"></td>
+                        <td><input type="text" name="to_date[]" value="{{ entry.to_date }}" size="8"></td>
+                        <td><input type="text" name="location[]" value="{{ entry.location }}"></td>
+                        <td><input type="text" name="description[]" value="{{ entry.description }}" size="40"></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td><input type="text" name="from_date[]" size="8"></td>
+                        <td><input type="text" name="to_date[]" size="8"></td>
+                        <td><input type="text" name="location[]"></td>
+                        <td><input type="text" name="description[]" size="40"></td>
+                    </tr>
+                {% endif %}
+            </table>
+            <div class="button-container">
+                <button type="submit" formaction="/process_cv" class="button next-button">Next</button>
+                <button type="button" id="addRow" class="button setting-button">Add row</button>
+                <button type="button" id="backButton" class="button back-button">Back</button>
+            </div>
+        </form>
+
+        <div class="info-icon">
+            <div class="tooltip">
+                <p>Hint: </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('backButton').addEventListener('click', function(event) {
+            window.location.href = "{{ url_for('character') }}";
+        });
+
+        document.getElementById('addRow').addEventListener('click', function(event) {
+            addRow();
+        });
+
+        function addRow() {
+            event.preventDefault();
+            var table = document.querySelector('table');
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            cell1.innerHTML = '<input type="text" name="from_date[]" size="8">';
+            cell2.innerHTML = '<input type="text" name="to_date[]" size="8">';
+            cell3.innerHTML = '<input type="text" name="location[]">';
+            cell4.innerHTML = '<input type="text" name="description[]" size="40">';
+        }
+    </script>
+</body>
+</html>

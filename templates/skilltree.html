@@ -74,16 +74,15 @@
             </div>
             {% endif %}
             {% endfor %}
-
+            <div class="info-icon">
+                <div class="tooltip">
+                    <p>Upvote skill: Left-Click</p>
+                    <p>Downvote skill: Ctrl + Left-Click</p>
+                    <p>Click on Category: Show / Hide skills</p>
+                </div>
+            </div>
             <div class="button-container">
                 <button type="submit" id="nextButton" formaction="/process_skilltree" class="button next-button">Next</button>
-                <div class="info-icon">
-                    <div class="tooltip">
-                        <p>Upvote skill: Left-Click</p>
-                        <p>Downvote skill: Ctrl + Left-Click</p>
-                        <p>Click on Category: Show / Hide skills</p>
-                    </div>
-                </div>
                 <button id="toggleExperienceButton" class="button setting-button">Show Exp</button>
                 <button id="backButton" class="button back-button">Back</button>
             </div>
@@ -106,7 +105,7 @@
         // Initialisieren des Zählers
         let skillCounter = 1000; // Starten Sie den Zähler bei 1000 oder einer anderen geeigneten Zahl
         document.getElementById('backButton').addEventListener('click', function(event) {
-            window.location.href = "{{ url_for('character') }}";
+            window.location.href = "{{ url_for('cv') }}";
         });
         document.getElementById('nextButton').addEventListener('click', function(event) {
             const skillNodes = document.querySelectorAll('.skill-node:not(.start)');
@@ -229,7 +228,6 @@
             };
 
             function addSkillToCategory(categoryNode) {
-                console.log("AddSkill");
                 event.preventDefault();
                 let skillName = prompt('Enter a name for the new skill:');
                 if (skillName.length > 25) {
@@ -421,8 +419,20 @@
                         connection.style.height = connectionLength + 'px';
                         connection.style.transform = 'rotate(' + angle + 'rad)';
                     });
+                    console.log("Test: " + categoryNode.dataset.displayedSite);
+                    console.log("Skills Länge: " + categoryNode.skills.length);
                     if((categoryNode.dataset.displayedSite * 8 - 1) < categoryNode.skills.length && flag === false){
                         toggleSkillVisibility(categoryNode.skills[categoryNode.dataset.displayedSite * 8 - 1]);
+
+                    }else if((categoryNode.dataset.displayedSite - 1) * 8 === categoryNode.skills.length && flag === false){
+                        console.log("Test Anzeige: " + categoryNode.dataset.displayedSite);
+                        categoryNode.dataset.displayedSite -= 1;
+                        let i = (categoryNode.dataset.displayedSite - 1) * 8;
+
+                        while(i < (categoryNode.dataset.displayedSite * 8) && i < categoryNode.skills.length) {
+                            toggleSkillVisibility(categoryNode.skills[i]);
+                            i += 1;
+                        }
                     }
 
                 }
