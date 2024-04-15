@@ -12,6 +12,7 @@
 
             {% for node in skill_tree_data %}
             {% if node.is_category %}
+            <!-- All category nodes got instantiated-->
             <div class="category-node"
                 data-skill-name="{{node.name}}"
                 data-id="{{node.id}}"
@@ -23,7 +24,7 @@
                 style="left: {{ node.position[0] }}px; top: {{ node.position[1] }}px;">
                 <span>{{ node.name }}</span>
 
-                <!-- Symbol zum Hinzufügen eines Skills -->
+                <!-- Button to add skills -->
                  <button class="button add-skill-button">+</button>
                 {% for connection in connections_data %}
                     {% if connection.skill_name == node.name %}
@@ -35,12 +36,13 @@
                         </div>
                     {% endif %}
                 {% endfor %}
-                <div class="buttons-container"> <!-- Container für die Buttons -->
-                    <button class="switch-left-button">&lt;</button> <!-- Button für links -->
-                    <button class="switch-right-button">&gt;</button> <!-- Button für rechts -->
+                <div class="buttons-container"> <!-- Container for Buttons -->
+                    <button class="switch-left-button">&lt;</button>
+                    <button class="switch-right-button">&gt;</button>
                 </div>
             </div>
             {% else %}
+            <!-- All skill nodes got instantiated-->
             <div class="skill-node
                  {% if node.is_start_node%}start{% endif %}
                  {% if node.is_category%}category{% endif %}
@@ -61,7 +63,7 @@
                 {% if node.is_custom_skill %}
                     <button class="button delete-skill-button">x</button>
                 {% endif %}
-                <!-- Verbindungslinie als Kindsknoten -->
+                <!-- Connections as childs -->
                 {% for connection in connections_data %}
                     {% if connection.skill_name == node.name %}
                         <div class="skill-connection"
@@ -74,6 +76,7 @@
             </div>
             {% endif %}
             {% endfor %}
+            <!-- Info icon (button) -->
             <div class="info-icon">
                 <div class="tooltip">
                     <p>Upvote skill: Left-Click</p>
@@ -102,8 +105,8 @@
 
     <script>
 
-        // Initialisieren des Zählers
-        let skillCounter = 1000; // Starten Sie den Zähler bei 1000 oder einer anderen geeigneten Zahl
+        // Initialize a counter, where the id of custom skills start
+        let skillCounter = 1000;
         document.getElementById('backButton').addEventListener('click', function(event) {
             window.location.href = "{{ url_for('cv') }}";
         });
@@ -111,7 +114,7 @@
             const skillNodes = document.querySelectorAll('.skill-node:not(.start)');
             let skillDataArray = [];
             skillNodes.forEach(function(node) {
-                // Extrahiere die relevanten Daten für jeden Skill
+                // Extract the relevant data of each skill
                 let skillData = {
                     'name': node.dataset.skillName,
                     'position': [node.style.left, node.style.top],
@@ -123,19 +126,18 @@
                     'is_active': node.classList.contains('active'),
                     'experience_level': node.dataset.experienceLevel
                 };
-                // Füge die extrahierten Daten dem Array hinzu
+                // Save the data in this array
                 skillDataArray.push(skillData);
             });
             sendDataToServer(skillDataArray);
         });
         function sendDataToServer(skillDataArray) {
-            // Erzeuge ein FormData-Objekt
             let data = new FormData();
 
-            // Füge das Array mit den Skill-Daten dem FormData-Objekt hinzu
+            //Add array to FormData-object
             data.append('skill_data', JSON.stringify(skillDataArray));
 
-            // Sende die Daten an die process_skilltree-Funktion über einen AJAX-Request
+            // Send the data to the function process_skilltree-Funktion with a AJAX-Request
             fetch('/process_skilltree', {
                 method: 'POST',
                 body: data
@@ -153,8 +155,6 @@
                 const node = event.target;
                 const isActive = node.classList.contains('active');
                     const isStartNode = node.dataset.isStartNode === 'True';
-                    const isCustomNode = node.dataset.isCustomNode === 'True';
-                    const isCategory = node.classList.contains('category');
                     const isCtrlPressed = event.ctrlKey || event.metaKey;
                     if (isStartNode) {
                         return;
@@ -166,7 +166,7 @@
             }
         });
 
-        function handleStatus(node, isCtrlPressed) {
+        function handleStatus(node, isCtrlPressed) { //Handle the experience level depending if it has to be upgraded or downgraded
             if (node.dataset.parentId != null) {
                     const isActive = node.classList.contains('active');
                     const parentId = node.dataset.parentId;
@@ -205,25 +205,23 @@
             }
         };
 
-            //Update the experience display 0/3
+            //Update the experience display to show it on the web page
             function updateExperienceDisplay(node) {
                 const experienceDisplay = node.querySelector('.experience-display');
-                console.log(experienceDisplay);
                 if (experienceDisplay) {
                     const experienceLevel = node.dataset.experienceLevel;
                     experienceDisplay.textContent = `${experienceLevel}/3`;
-                    console.log("Exp-Update success");
                 }
             };
 
-            function toggleExperienceDisplays() {
+            function toggleExperienceDisplays() { //toggle visibility of the displays
                 const experienceDisplays = document.querySelectorAll('.experience-display');
                 experienceDisplays.forEach(function(display) {
                     display.classList.toggle('hidden');
                 });
             };
 
-            function generateUniqueId() {
+            function generateUniqueId() { //Unique id for custom nodes starting at 1000
                 return (++skillCounter);
             };
 
@@ -234,7 +232,7 @@
                     alert('Skill name is too long. Please enter a name with at most 25 characters.');
                     return;
                 } else {
-                    // Fügen Sie einen Zeilenumbruch nach 13 Zeichen ein, wenn der Skillname länger ist
+                    // Newline after 13 letters
                     if (skillName.length > 13) {
                         let modifiedSkillName = '';
                         for (let i = 0; i < skillName.length; i++) {
@@ -243,10 +241,11 @@
                                 modifiedSkillName += ' ';
                             }
                         }
-                        skillName = modifiedSkillName; // Hier können Sie modifiedSkillName verwenden, um den angepassten Skillnamen zu verwenden
+                        skillName = modifiedSkillName;
                     }
                 }
 
+                //A new skill depending on the position of the category node is added with all skill features if the skillName exists
                 if (skillName) {
                     const newSkillNode = document.createElement('div');
                     newSkillNode.classList.add('skill-node');
@@ -318,6 +317,7 @@
                                 newSkillNode.style.top = topPosition + 100 + 'px';
                                 break;
                         }
+                        //Only shows the skill, if it is on the right page, otherwise it is hidden to prevent overlapping
                         if((categoryNode.dataset.displayedSite * 8) <= categoryNode.skills.length - categoryNode.skills.length % 8) {
                             toggleSkillVisibility(newSkillNode);
                         }else if(categoryNode.dataset.isDisplayed == 0) {
@@ -332,6 +332,7 @@
                 }
             };
 
+            //Connections simialar to the Python code at the start of the web application
             function createConnection(categoryNode, newSkillNode) {
                 const categoryNodeRect = categoryNode.getBoundingClientRect();
                 let newSkillNodeRect = null;
@@ -361,6 +362,7 @@
                 newSkillNode.appendChild(connection);
             };
 
+            //Algorithm to guarantee a strictly defined circular ordering beginning below the category node
             function reorderAlgo(categoryNode, index, flag) {
                 if(categoryNode.skills.length >= 0){
                     const categoryNodeRect = categoryNode.getBoundingClientRect();
@@ -425,7 +427,6 @@
                         toggleSkillVisibility(categoryNode.skills[categoryNode.dataset.displayedSite * 8 - 1]);
 
                     }else if((categoryNode.dataset.displayedSite - 1) * 8 === categoryNode.skills.length && flag === false){
-                        console.log("Test Anzeige: " + categoryNode.dataset.displayedSite);
                         categoryNode.dataset.displayedSite -= 1;
                         let i = (categoryNode.dataset.displayedSite - 1) * 8;
 
@@ -445,6 +446,7 @@
                 toggleExperienceDisplays();
             });
 
+            //Switching between the pages to display more skills
             document.addEventListener('click', function(event) {
                 event.preventDefault();
                 if (event.target.classList.contains('switch-left-button')) {
@@ -466,6 +468,7 @@
                 }
             });
 
+            //Switching between the pages to display more skills
             document.addEventListener('click', function(event) {
                 event.preventDefault();
                 if (event.target.classList.contains('switch-right-button')) {
@@ -483,6 +486,7 @@
                 }
             });
 
+            //AddSkillToCategory is running
             document.addEventListener('click', function(event) {
                 event.preventDefault();
                 if (event.target.classList.contains('add-skill-button')) {
@@ -492,20 +496,18 @@
                 }
             });
 
+            //Delete a skill
             document.addEventListener('click', function(event) {
                 event.preventDefault();
                 if (event.target.classList.contains('delete-skill-button')) {
                     event.stopPropagation();
                     const skillNode = event.target.parentNode;
                         const categoryName = skillNode.dataset.category;
-                        const categoryNode = document.querySelector(`.category-node[data-skill-name*='${categoryName}']`);
-                        console.log("Länge vor splice " + categoryNode.skills.length);
+                        const categoryNode = document.querySelector(`.category-node[data-skill-name*='${categoryName}']`);;
                         const index = categoryNode.skills.indexOf(skillNode);
                         categoryNode.skills.splice(categoryNode.skills.indexOf(skillNode), 1);
-                        console.log("Länge nach splice " + categoryNode.skills.length);
                         deleteSkill(skillNode);
                         reorderAlgo(categoryNode, index, false);
-
                 }
             });
 
@@ -513,6 +515,7 @@
                 skillNode.remove();
             };
 
+            //Toggle Visibility when a category node is clicked or the switch between the shown page is conducted
             function toggleDisplayedSkillVisibility(categoryNode, direction){
                 const displayedSite = categoryNode.dataset.displayedSite;
                 if(direction == "left") {
@@ -550,7 +553,6 @@
 
                     console.log("MaxSize " + maxSize);
                     if(displayedSite == maxSize) {
-                        console.log("MaxSize-Bereich");
                         let i = (displayedSite - 1) * 8;
                         while(i < (displayedSite * 8) && i < categoryNode.skills.length) {
                             toggleSkillVisibility(categoryNode.skills[i]);
@@ -586,8 +588,6 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             const categoryNodes = document.querySelectorAll('.category-node');
-
-            // Durchlaufen aller Category-Nodes
             categoryNodes.forEach(function(categoryNode) {
                 categoryNode.skills = [];
 
@@ -616,7 +616,6 @@
                     const skillName = node.dataset.skillName;
                     console.log('Clicked Skill Name:', skillName);
                     toggleSkill(skillName);
-                    console.log('toggle klappt');
                 });
             });
             */
@@ -648,7 +647,7 @@
             const applyButton = document.getElementById('applyButton');
             if(applyButton != null){
                 applyButton.addEventListener('click', function() {
-                    event.preventDefault();  // Verhindert das Seitenneuladen
+                    event.preventDefault();  // Prevent reload of the page
 
                     const activatedSkills = document.querySelectorAll('.skill-node.active');
                     const activatedSkillNames = Array.from(activatedSkills).filter(skill => skill.dataset.skillName !== "Skills").map(skill => ({
@@ -656,11 +655,6 @@
                         category: skill.dataset.category,
                         experienceLevel: skill.dataset.experienceLevel
                         }));
-
-                    console.log('Aktivierte Skills:', activatedSkillNames);
-
-                    // Hier könnte eine AJAX-Anfrage an den Server gesendet werden, um die Daten zu übermitteln
-                    // Beispiel: fetch('/submit_skills', { method: 'POST', body: JSON.stringify(activatedSkillNames) });
                 });
             }
 

@@ -93,7 +93,6 @@
                 body: formData
             }).then(response => {
                 if (response.ok) {
-                    console.log('Bild erfolgreich gespeichert.');
                     const image = document.getElementById('uploaded-image');
                     const uploadedImage = document.getElementById('uploaded_image');
                     const reader = new FileReader();
@@ -108,7 +107,7 @@
                     }
                     reader.readAsDataURL(file);
                 } else {
-                    console.error('Fehler beim Speichern des Bildes.');
+                    console.error('Error during saving the image.');
                 }
             });
         });

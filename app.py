@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.secret_key = 'test'
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'temp_uploads')
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'temp_uploads') # Path where the uploaded images are saved during the process
 app.config['UPLOAD_FOLDER'] = 'static/temp_uploads'
 
 class Skill:
@@ -36,31 +36,6 @@ class Skill:
         self.experience_level = 0
         self.is_category = is_category
 
-        if category:
-            category.add_child(self)
-
-    def add_child(self, child):
-        self.children.append(child)
-
-    def activate(self):
-        if not self.is_start_node and (not self.category or self.category.is_active):
-            self.is_active = True
-
-    def deactivate(self):
-        if not self.is_start_node:
-            self.is_active = False
-            for child in self.children:
-                child.deactivate()
-
-    def toggle_state(self):
-        print("Befinden uns in toggle_state")
-        if not self.is_active:
-            self.is_active = True
-            self.activate()
-        else:
-            self.is_active = False
-            self.deactivate()
-
 
 class SkillTree:
     def __init__(self):
@@ -71,6 +46,7 @@ class SkillTree:
         self.skills.append(skill)
 
     def get_skill_tree_data(self):
+        #Provide all the necessary data to draw the skilltree
         data = []
         for skill in self.skills:
             category_name = skill.category.name if skill.category else None
@@ -90,7 +66,7 @@ class SkillTree:
         return data
 
     def get_actual_skill_tree_data(self, stored_skills):
-        print(stored_skills)
+        #Important to restore the actual skilltree during a session
         for skill in self.skills:
             category_name = skill.category.name if skill.category else None
             parent_id = skill.category.id if skill.category else None
@@ -122,17 +98,13 @@ class SkillTree:
                 })
         return stored_skills
 
-    def get_skill_by_id(self, skill_id):
-        for skill in self.skills:
-            if skill.id == skill_id:
-                return skill
-        return None
-
     def calculate_angle(self, x1, y1, x2, y2):
+        #Math to calculate the angle the connection line between two nodes
         angle = math.atan2(y2 - y1, x2 - x1)
         return angle - math.pi / 2
 
     def draw_connections(self):
+        #Draw all connections between nodes, when no data in the session is stored
         connections = []
         for skill in self.skills:
             if skill.category:
@@ -156,6 +128,7 @@ class SkillTree:
 
         return connections
     def draw_new_connections(self, stored_skills):
+        #Draw all connections between nodes, when data in the session is stored
         global category
         connections = []
         for skill in stored_skills:
@@ -186,16 +159,6 @@ class SkillTree:
                 })
 
         return connections
-
-    @app.route('/toggle_skill/<skill_name>', methods=['POST'])
-    def toggle_skill(skill_id):
-        skill = skill_tree.get_skill_by_id(skill_id)
-
-        if skill:
-            skill.toggle_state()
-            return jsonify({'success': True, 'message': f'Skill {skill_id} toggled successfully'})
-        else:
-            return jsonify({'success': False, 'message': f'Skill {skill_id} not found'})
 
 def create_skill_tree():
     skill_tree = SkillTree()
@@ -266,7 +229,7 @@ def create_skill_tree():
 
     # </editor-fold>
 
-    # Add skills
+    # Add skills to the skilltree
     # <editor-fold desc="Add skills to the tree">
     skill_tree.add_skill(learn_skill)
     skill_tree.add_skill(structured_working_skill)
@@ -326,17 +289,16 @@ def create_skill_tree():
 
     return skill_tree
 
+
 global random_username
 
 def create_user_folder():
-    print("Test create folder")
     random_user = random.randint(1, 10000000)
     random_username = str(random_user)
 
-    print("Randomuser: " + random_username)
-    user_folder = base_dir + "/static/temp_uploads/" + random_username
+    user_folder = base_dir + "/static/temp_uploads/" + random_username #create a path for each user with a random number between 1 and 10000000 as name
     if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
+        os.makedirs(user_folder) #create a folder for the user
     return random_username
 
 @app.route('/', methods=['GET', 'POST'])
@@ -346,7 +308,6 @@ def home():
 
 @app.route('/character', methods=['GET'])
 def character():
-    # Überprüfe, ob die Session-Variablen vorhanden sind
     first_name = session.get('first_name')
     last_name = session.get('last_name')
     birth_date = session.get('birth_date')
@@ -357,7 +318,7 @@ def character():
     gender = session.get('gender')
     image_name = session.get('image_name')
 
-    # Gehe sicher, dass "None" nicht in das Template eingesetzt wird
+    # Render the template and fill the fields with the corresponding values or leave it empty
     return render_template('character.html', first_name=first_name or '',
                            last_name=last_name or '', birth_date=birth_date or '', country_of_birth=country_of_birth or '',
                            phone=phone or '', address=address or '', email=email or '', gender=gender or '',
@@ -368,40 +329,31 @@ def perkmenu():
     tool_data = session.get('tool_data')
     hobbys = session.get('hobbys')
 
+    # Render the template and fill the fields with the corresponding values or leave it empty
     return render_template('perkmenu.html', tool_data=tool_data or '', hobbys=hobbys or '')
 
 @app.route('/cv', methods=['GET', 'POST'])
 def cv():
     resume_entries = session.get('resume')
+    # Render the template and fill the fields with the corresponding values or leave it empty
     return render_template('cv.html', resume_entries=resume_entries or '')
 
 @app.route('/save_image_data', methods=['POST'])
 def save_image_data():
-    print("Test image")
     if 'image' not in request.files:
-        print("Erste Abrage")
         return 'No file part', 400
 
     file = request.files['image']
     if file.filename == '':
-        print("Zweite Abfrage")
         return 'No selected file', 400
 
     user_folder = create_user_folder()
-    print("Test folder" + user_folder)
     filename = secure_filename(file.filename)
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print(image_path)
-    new_image_path = image_path.replace('\\', '/')
-    print(new_image_path)
-    print(filename)
-    session['user_folder'] = user_folder
+    session['user_folder'] = user_folder # Save the folder name in the session
     temp_image_path = base_dir + "/static/temp_uploads/" + user_folder + "/" + filename
-    print("Testweise ob der Pfad stimmt: " + temp_image_path)
-    file.save(temp_image_path)
-    session['image_name'] = filename  # Speichern Sie den Dateinamen in der Sitzung
-    print("Ist schonmal besser")
-    return 'Bild erfolgreich hochgeladen.', 200
+    file.save(temp_image_path) #Save the file
+    session['image_name'] = filename  # Save the data name in the session
+    return 'Bild uploaded successfully.', 200
 
 @app.route('/process_cv', methods=['POST'])
 def process_cv():
@@ -410,7 +362,7 @@ def process_cv():
     locations = request.form.getlist('location[]')
     descriptions = request.form.getlist('description[]')
 
-    # Erstelle eine Liste von Einträgen für den Lebenslauf
+    # List with all entries of the cv
     resume_entries = []
     for from_date, to_date, location, description in zip(from_dates, to_dates, locations, descriptions):
         entry = {
@@ -421,10 +373,10 @@ def process_cv():
         }
         resume_entries.append(entry)
 
-    # Speichere die Lebenslauf-Einträge in der Session
+    # Save this list in the session
     session['resume'] = resume_entries
 
-    # Umleitung zur Seite für den Lebenslauf oder wo auch immer Sie hin möchten
+    # Redirect to the skilltree
     return redirect(url_for('skilltree'))
 @app.route('/process_character', methods=['POST'])
 def process_character():
@@ -436,7 +388,7 @@ def process_character():
     address = request.form.get('address')
     email = request.form.get('email')
     gender = request.form.get('gender')
-    # Speichere die Daten in Session-Variablen
+    # Save all data fields in the session
     session['first_name'] = first_name
     session['last_name'] = last_name
     session['birth_date'] = birth_date
@@ -450,10 +402,11 @@ def process_character():
 @app.route('/process_skilltree', methods=['POST'])
 def process_skilltree():
     stored_skills = []
+    #Load the skilltree-data
     skill_data = request.form.get('skill_data')
     if skill_data:
         stored_skills = json.loads(skill_data)
-    session['skills'] = stored_skills
+    session['skills'] = stored_skills #Store the data in the session
     return redirect(url_for('perkmenu'))
 
 @app.route('/endscreen', methods=['GET', 'POST'])
@@ -461,6 +414,7 @@ def endscreen():
     return render_template('endscreen.html')
 @app.route('/submit_perkmenu', methods=['POST'])
 def submit_perkmenu():
+    #Load and save the data
     tool_data = request.form.get('learned_programs')
     hobby_data = request.form.get('hobbys')
     session['tool_data'] = tool_data
@@ -469,12 +423,12 @@ def submit_perkmenu():
 
 @app.route('/create_pdf')
 def create_pdf():
-    # Erstelle ein neues PDF-Dokument
+    # Create the output pdf
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     x = 100
     y = 750
-    # Füge die gesammelten Informationen in das PDF-Dokument ein
+    #Input of all information (redundant code -> not best practice by now)
     c.setFont('Helvetica-Bold', 16)
     c.drawString(x, y, "Applicant Information")
     y -= 20
@@ -534,8 +488,8 @@ def create_pdf():
             c.drawString(x + 2 * col_width, y, entry['location'])
             c.drawString(x + 3 * col_width, y, entry['description'])
             if y < 50:
-                c.showPage()  # Beginne eine neue Seite
-                y = 750  # Setze die y-Position für die neue Seite
+                c.showPage()  # Start on new page
+                y = 750  # Reset the y-Variable
 
     y -= 40
     c.setFont('Helvetica-Bold', 16)
@@ -543,9 +497,8 @@ def create_pdf():
     y -= 20
     c.setFont('Helvetica', 12)
     skills = session.get('skills')
-    # Zeichne die Daten in das PDF-Dokument
-    line_height = 14  # Zeilenhöhe
-    max_width = 400  # Maximale Breite des Textbereichs
+    line_height = 14
+    max_width = 400  # max with of the text area
     for skill in skills:
         if skill['is_active']:
             skill_name = skill['name']
@@ -555,11 +508,11 @@ def create_pdf():
             experience_level = skill['experience_level']
             c.drawString(x + 300, y, f"Experience Level: {experience_level}/3")
 
-            # Aktualisiere die y-Position für den nächsten Skill
+            # Hold the y actual every iteration
             y -= line_height
             if y < 50:
-                c.showPage()  # Beginne eine neue Seite
-                y = 750  # Setze die y-Position für die neue Seite
+                c.showPage()
+                y = 750
 
     def wrap_text(text, max_width):
         lines = []
@@ -567,7 +520,7 @@ def create_pdf():
         words = text.split()
         for i, word in enumerate(words):
             if c.stringWidth(line + word, 'Helvetica', 12) < max_width:
-                # Füge das Wort mit einem Komma und einem Leerzeichen hinzu, außer beim ersten Wort
+                #Add the words with a comma and a space, except the first one
                 if line:
                     line += ', ' + word
                 else:
@@ -575,10 +528,10 @@ def create_pdf():
             else:
                 lines.append(line)
                 line = word
-        lines.append(line)  # Füge die letzte Zeile hinzu
+        lines.append(line)
         return lines
 
-    # Zeichne Learned Tools
+    # Draw the learned tools
     y -= 16
     c.setFont('Helvetica-Bold', 16)
     c.drawString(x, y, "Learned Tools")
@@ -589,10 +542,10 @@ def create_pdf():
         c.drawString(x + 20, y, line)
         y -= line_height
         if y < 50:
-            c.showPage()  # Beginne eine neue Seite
-            y = 750  # Setze die y-Position für die neue Seite
+            c.showPage()
+            y = 750
 
-    # Zeichne Hobbys
+    # Draw hobbys / soft skills
     y-= 6
     c.setFont('Helvetica-Bold', 16)
     c.drawString(x, y, "Hobbys")
@@ -604,8 +557,8 @@ def create_pdf():
         c.drawString(x + 20, y, line)
         y -= line_height
         if y < 50:
-            c.showPage()  # Beginne eine neue Seite
-            y = 750  # Setze die y-Position für die neue Seite
+            c.showPage()
+            y = 750
 
     # Save and close pdf
     c.save()
@@ -635,6 +588,7 @@ def create_pdf():
 def skilltree():
     global skill_tree
     skill_tree = create_skill_tree()
+    #Load the skilltree depending if new skilltree data exists or not
     if session.get('skills') is not None:
         stored_skills = session.get('skills')
         new_skill_tree_data = skill_tree.get_actual_skill_tree_data(stored_skills)
@@ -649,6 +603,7 @@ def skilltree():
                            activated_skills=activated_skills)
 
 def clear_session_at_exit():
+    #Clear the session data after finish
     session.clear()
     print("Session cleared at program exit")
 
