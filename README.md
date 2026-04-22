@@ -66,5 +66,3 @@ To get a local copy up and running, follow these simple steps:
 6. **Open in Browser**
    Navigate to `http://localhost:5000`
 
-## 🎓 Learning Outcomes
-This project bridged the gap between theoretical process optimization (Business Informatics) and practical software engineering. It heavily improved my understanding of DOM manipulation, backend-frontend communication via Fetch API, and refactoring a monolithic script into a scalable, enterprise-ready structure.
