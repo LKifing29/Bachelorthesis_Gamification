@@ -1,124 +1,19 @@
-/* skilltree */
-.skill-node {
-    user-select: none; //Textmarkierung deaktiviert
-}
+/* ==========================================================================
+   1. GLOBAL VARIABLES & BASE STYLES
+   ========================================================================== */
+:root {
+    /* Color Palette */
+    --primary-color: #00B2C4;
+    --bg-main: #5f5f5f;
+    --bg-container: #656565;
+    --bg-dark: #3E3E3E;
+    --text-light: #ffffff;
+    --text-dark: #000000;
 
-.category-node {
-    user-select: none; //Textmarkierung deaktiviert
-}
-
-/* Für die Buttons */
-.button {
-    user-select: none; //Textmarkierung deaktiviert
-}
-
-.hidden {
-    display: none;
-}
-
-form.skilltree-container {
-    min-height: calc(100vh - 200px);
-    height: 100vh; /* Verwendet 100% der Höhe des Anzeigebereichs */
-    width: 100%; /* Verwendet 100% der Breite des Anzeigebereichs */
-    overflow-y: scroll; /* Zeigt eine Scrollleiste an, wenn der Inhalt die Höhe des Containers überschreitet */
-    overflow-x: hidden; /* Versteckt die horizontale Scrollleiste, falls nicht benötigt */
-    position: absolute; /* Position relativ, damit absolute positionierte Kinder relativ dazu positioniert werden */
-    margin-bottom: 150px;
-}
-
-.category-node{
-    position: absolute;
-    width: 100px;  /* Adjusted size */
-    height: 100px;  /* Adjusted size */
-    border-radius: 50%;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #00B2C4; /* Default color */
-    color: black;  /* Font color */
-    cursor: pointer;
-}
-
-.skill-node {
-    position: absolute;
-    width: 90px;  /* Adjusted size */
-    height: 90px;  /* Adjusted size */
-    border-radius: 50%;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #a9a9a9; /* Default color */
-    color: black;  /* Font color */
-}
-
-.skill-node.active {
-    background-color: #00B2C4; /* Active color, you can change it */
-}
-
-.skill-node.start {
-    background-color: #D5641E; /* Active color, you can change it */
-    width: 100px;  /* Adjusted size */
-    height: 100px;  /* Adjusted size */
-    border: 2px solid black;
-
-}
-
-.skill-node.category {
-    background-color: #00B2C4; /* Active color, you can change it */
-}
-
-.skill-node.custom {
-    background-color: #69a5a9; /* Custom color, you can change it */
-}
-
-.skill-node.hidden {
-    display: none;
-}
-
-/* Add a new class for the lines between skills */
-.skill-connection {
-    position: absolute;
-    background-color: black; /* Line color */
-    z-index: -1;  /* Place the lines behind the nodes */
-    pointer-events: none;  /* Ensure lines do not block mouse interaction with nodes */
-    width: 2px;  /* Set a default width for the lines */
-    transform-origin: top;  /* Set the rotation origin to the top */
-}
-
-/* startingpage */
-
-.welcome-container {
-    width: 100%;
-    left: 50%;
-
-    margin-bottom: 20px;
-    text-align: center;
-}
-.landing-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items: center;
-    background-color: #656565;
-    padding: 30px;
-    box-shadow: 0px 0px 10px 20px #00B2C4;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-    gap: 50px;
-}
-
-/* Experience */
-.experience-display {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    color: #ffffff;  /* Textfarbe anpassen */
-    font-size: 12px;  /* Schriftgröße anpassen */
-    background-color: #000000;  /* Hintergrundfarbe anpassen */
-    padding: 2px 5px;  /* Innenabstand anpassen */
+    /* Skill Node Colors */
+    --node-default: #a9a9a9;
+    --node-start: #D5641E;
+    --node-custom: #69a5a9;
 }
 
 body {
@@ -129,12 +24,14 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background-color: #5f5f5f;
+    background-color: var(--bg-main);
     font-size: 13px;
-    color: white;
+    color: var(--text-light);
 }
 
-/* Character*/
+/* ==========================================================================
+   2. LAYOUT CONTAINERS & GENERAL STRUCTURE
+   ========================================================================== */
 .container {
     display: flex;
     flex-direction: row;
@@ -142,33 +39,131 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 30px;
-    color: white;
+    color: var(--text-light);
 }
+
+.welcome-container {
+    width: 100%;
+    left: 50%;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: var(--bg-container);
+    padding: 30px;
+    box-shadow: 0px 0px 10px 20px var(--primary-color);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    gap: 50px;
+}
+
 .form-container {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    background-color: #656565;
+    background-color: var(--bg-container);
     padding: 30px;
-    box-shadow: 0px 0px 7px 10px #00B2C4;
+    box-shadow: 0px 0px 7px 10px var(--primary-color);
     border-radius: 20px;
     margin-bottom: 50px;
 }
+
 .fields-container {
     display: flex;
     justify-content: space-between;
     gap: 25px;
-
 }
-.field-column {
-    width: 45%; /* Anpassen je nach gewünschter Breite der Spalten */
-    /* Weitere Stile für die Spalten */
+
+.fields-column, .field-column {
+    width: 45%;
     justify-content: space-between;
     gap: 25px;
     margin: 20px;
 }
 
+/* ==========================================================================
+   3. FORM ELEMENTS & INPUTS
+   ========================================================================== */
+.field {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.field input {
+    color: var(--primary-color);
+    background: none;
+    padding: 0.625rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+.field label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(0.625rem, 0.625rem);
+    color: var(--text-dark);
+    background-color: transparent;
+    padding-inline: 0 0.25rem;
+    pointer-events: none;
+    transition: transform 250ms, background-color 250ms, border-color 250ms;
+}
+
+.field:focus-within label,
+.field:not(:has(:placeholder-shown)) label {
+    transform: translate(0.625rem, -1rem);
+}
+
+.field ::placeholder {
+    color: transparent;
+}
+
+/* Dropdown Selects */
+.field-select {
+    display: flex;
+    align-items: center;
+}
+
+.field-select label {
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.field-select .select-dropdown {
+    color: var(--primary-color);
+    background: none;
+    padding: 0.625rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+.field-select .select-label {
+    position: absolute;
+    transform: translate(0.2rem, -1.7rem);
+    color: var(--text-dark);
+    background-color: transparent;
+    padding: 0 0.25rem;
+    border-radius: 5px;
+    pointer-events: none;
+    transition: transform 250ms, background-color 250ms, border-color 250ms;
+}
+
+.field-select .select-dropdown:focus + .select-label,
+.field-select .select-dropdown:not(:placeholder-shown) + .select-label {
+    transform: translateY(-0.5rem);
+    border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   4. IMAGE UPLOAD SECTION
+   ========================================================================== */
 .image-container {
     left: 20px;
     top: 10px;
@@ -182,229 +177,232 @@ body {
     margin-right: 20px;
 }
 
-#image-upload-label {
+#image-upload {
+    display: none;
+}
 
+#image-upload-label {
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
-    background-color: #3E3E3E; /* Hintergrundfarbe des Labels */
-    border: 2px dashed #ccc; /* Gestrichelter Rahmen um das Label */
+    background-color: var(--bg-dark);
+    border: 2px dashed #ccc;
     border-color: white;
     cursor: pointer;
-
 }
+
 #image-upload-label img {
-    width: 160px; /* Breite des Icons anpassen */
-    height: 200px; /* Höhe des Icons anpassen */
-}
-
-.field {
-    position: relative;
-    margin-bottom: 30px;
-}
-.field-select {
-    display: flex;
-    align-items: center;
-}
-.field-select label {
-    margin-right: 10px;
-    color: #00B2C4;
-}
-.field input {
-    color: #00B2C4;
-    background: none;
-    padding: 0.625rem;
-    border: 2px solid #00B2C4;
-    border-radius: 5px;
-}
-.field label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    translate: 0.625rem 0.625rem;
-    color: #000000;
-    background-color: transparent;
-    padding-inline: 0 0.25rem;
-    pointer-events: none;
-    transition: translate 250ms,
-                background-color 250ms,
-                border-color 250ms;
-}
-.field:focus-within label,
-.field:not(:has(:placeholder-shown)) label {
-    translate: 0.625rem -1rem;
-
-}
-.field ::placeholder {
-    color: transparent;
-}
-
-.field-select .select-dropdown {
-    color: #00B2C4;
-    background: none;
-    padding: 0.625rem;
-    border: 2px solid #00B2C4;
-    border-radius: 5px;
-}
-
-.field-select .select-label {
-    position: absolute;
-    translate: 0.2rem -1.7rem;
-    color: #000000;
-    background-color: transparent;
-    padding: 0 0.25rem;
-    border-radius: 5px;
-    pointer-events: none;
-    transition: transform 250ms, background-color 250ms, border-color 250ms;
-}
-
-.field-select .select-dropdown:focus + .select-label,
-.field-select .select-dropdown:not(:placeholder-shown) + .select-label{
-    transform: translateY(-0.5rem);
-    border-color: #00B2C4;
-}
-.submit-container {
     width: 100%;
-    margin-top: 20px;
-    text-align: center;
-
+    height: 100%;
+    object-fit: cover;
 }
 
-.bottom-sticky {
-    position: fixed;
-    bottom: 20px;
-}
-.top-sticky {
-    position: fixed;
-    top: 20px;
-}
-
-.back-button {
-    margin-left: 10px;
-}
-.next-button {
-    margin-right: 10px;
-}
-
+/* ==========================================================================
+   5. BUTTONS & UI ACTIONS
+   ========================================================================== */
 .button {
+    user-select: none; /* Textmarkierung deaktiviert - repariert */
     position: absolute;
     display: inline-block;
     padding: 10px 20px;
-    background-color: #00B2C4;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--text-light);
     text-decoration: none;
     font-size: 18px;
     margin-top: 20px;
     border-radius: 5px;
 }
+
+.button:hover {
+    background-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.submit-container {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.bottom-sticky { position: fixed; bottom: 20px; }
+.top-sticky { position: fixed; top: 20px; }
+.back-button { margin-left: 10px; }
+.next-button { margin-right: 10px; }
+
 .buttons-container {
-    position: absolute; /* Positionierung relativ zum übergeordneten .category-node */
-    top: 68%; /* Platzieren Sie den Container direkt unterhalb des Namens */
-    left: 50%; /* Zentrieren Sie den Container horizontal */
-    transform: translateX(-50%); /* Zentrieren Sie den Container horizontal relativ zur Breite */
+    position: absolute;
+    top: 68%;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: row;
 }
 
-.button:hover {
-    background-color: #00B2C4;
-    transform: scale(1.1);
-}
-
 .button-container {
     position: fixed;
-    bottom: 0px; /* Abstand vom unteren Rand */
-    width: calc(100% - 40px); /* Breite des Containers mit Abstand links und rechts */
-    max-width: 70%; /* Maximale Breite des Containers */
+    bottom: 0px;
+    width: calc(100% - 40px);
+    max-width: 70%;
     height: 50px;
-    left: 50%; /* Horizontal mittig positionieren */
-    transform: translateX(-50%); /* Verschieben um die Hälfte der eigenen Breite nach links */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: space-between; /* Buttons gleichmäßig im Container verteilen */
+    justify-content: space-between;
     align-items: center;
     flex-direction: row-reverse;
     gap: 25px;
-    padding-bottom: 20px; /* Innenabstand für die Buttons */
-    background-color: #3E3E3E; /* Hintergrundfarbe des Containers */
-    border: 2px solid #000000; /* Rand des Containers */
-    border-radius: 10px; /* Abrundung der Ecken */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Schatten für den Container */
+    padding-bottom: 20px;
+    background-color: var(--bg-dark);
+    border: 2px solid var(--text-dark);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-top: 30px;
 }
 
 .button-container button {
     position: relative;
-    padding: 10px 20px; /* Innenabstand für die Buttons */
-    font-size: 16px; /* Schriftgröße der Buttons */
-    background-color: #00B2C4; /* Hintergrundfarbe der Buttons */
-    color: #ffffff; /* Textfarbe der Buttons */
-    border: none; /* Rand der Buttons */
-    border-radius: 5px; /* Abrundung der Ecken der Buttons */
-    cursor: pointer; /* Mauszeiger bei Hover */
-    transition: background-color 0.3s, color 0.3s; /* Animationsübergangseffekte */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
+/* Add / Delete Skill Buttons */
 .add-skill-button {
-    display: none; /* Der Button ist standardmäßig ausgeblendet */
+    display: none;
     padding: 1px;
-    right: -15px; /* Abstand vom rechten Rand des .skill-node */
-    top:0%; /* Zentrieren Sie den Button vertikal im .skill-node */
-    background-color: green; /* Transparenter Hintergrund */
+    right: -15px;
+    top: 0%;
+    background-color: green;
     text-decoration: none;
     font-size: 18px;
     border-radius: 20px;
-    color: black;  /* Font color */
-}
-.add-skill-button:hover {
-    background-color: green;
+    color: var(--text-dark);
 }
 
-.category-node:hover .add-skill-button {
-    display: inline-block; /* Der Button wird angezeigt, wenn die Kategorie mit der Maus überfahren wird */
-}
+.add-skill-button:hover { background-color: green; }
+.category-node:hover .add-skill-button { display: inline-block; }
 
 .delete-skill-button {
-    display: none; /* Der Button ist standardmäßig ausgeblendet */
+    display: none;
     padding: 2px;
-    right: -15px; /* Abstand vom rechten Rand des .skill-node */
-    top:0%; /* Zentrieren Sie den Button vertikal im .skill-node */
-    background-color: transparent; /* Transparenter Hintergrund */
+    right: -15px;
+    top: 0%;
+    background-color: transparent;
     text-decoration: none;
     font-size: 18px;
     border-radius: 20px;
-    color: red;  /* Font color */
+    color: red;
 }
 
-.delete-skill-button:hover {
-    background-color: black;
-}
-.skill-node:hover .delete-skill-button {
-    display: inline-block; /* Der Button wird angezeigt, wenn die Kategorie mit der Maus überfahren wird */
+.delete-skill-button:hover { background-color: var(--text-dark); }
+.skill-node:hover .delete-skill-button { display: inline-block; }
+
+/* ==========================================================================
+   6. SKILLTREE NODES & CONNECTIONS
+   ========================================================================== */
+.skill-node, .category-node {
+    user-select: none; /* Reparierter Kommentar */
 }
 
+.hidden { display: none; }
+
+form.skilltree-container {
+    min-height: calc(100vh - 200px);
+    height: 100vh;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: absolute;
+    margin-bottom: 150px;
+}
+
+.category-node {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.skill-node {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--node-default);
+    color: var(--text-dark);
+}
+
+.skill-node.active { background-color: var(--primary-color); }
+.skill-node.start {
+    background-color: var(--node-start);
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--text-dark);
+}
+
+.skill-node.category { background-color: var(--primary-color); }
+.skill-node.custom { background-color: var(--node-custom); }
+.skill-node.hidden { display: none; }
+
+.skill-connection {
+    position: absolute;
+    background-color: var(--text-dark);
+    z-index: -1;
+    pointer-events: none;
+    width: 2px;
+    transform-origin: top;
+}
+
+.experience-display {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: var(--text-light);
+    font-size: 12px;
+    background-color: var(--text-dark);
+    padding: 2px 5px;
+}
+
+/* ==========================================================================
+   7. TOOLTIPS & UTILITIES
+   ========================================================================== */
 .info-icon {
     width: 40px;
     height: 40px;
     left: 20px;
     top: 20px;
-    background-image: url('/static/info-circle.svg'); /* Hier den Pfad zum Icon-Bild einfügen */
+    background-image: url('/static/info-circle.svg');
     cursor: pointer;
-    position: fixed; /* Erforderlich für die Positionierung des Tooltip-Inhalts */
+    position: fixed;
     background-color: white;
     border-radius: 90px;
 }
 
-.info-icon:hover .tooltip {
-    display: block; /* Zeigt die Tooltip-Box an, wenn das Icon gehovert wird */
-}
+.info-icon:hover .tooltip { display: block; }
 
 .tooltip {
-    display: none; /* Versteckt die Tooltip-Box standardmäßig */
+    display: none;
     position: relative;
-    top: calc(100% + 5px); /* Positioniert die Tooltip-Box unterhalb des Icons */
+    top: calc(100% + 5px);
     left: 100px;
     transform: translateX(-50%);
     background-color: rgba(0, 0, 0, 0.8);
@@ -413,11 +411,9 @@ body {
     border-radius: 5px;
     font-size: 14px;
     z-index: 999;
-    width: 200px; /* Breite der Tooltip-Box anpassen */
-
+    width: 200px;
 }
 
-/* Optional: Pfeil für die Tooltip-Box */
 .tooltip::after {
     content: '';
     position: absolute;
@@ -429,18 +425,16 @@ body {
     border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
 
-/* Media Query für Bildschirmhöhe */
+/* ==========================================================================
+   8. MEDIA QUERIES
+   ========================================================================== */
 @media screen and (max-height: 800px) {
-  /* Stile für alle Felder auf der Seite */
-  .field input[type="text"],
-  .field input[type="date"],
-  .field input[type="email"],
-  .field input[type="tel"],
-  .field select {
-    padding: 0.5em; /* Reduziert den Padding um 50% */
-    font-size: 0.8em; /* Reduziert die Schriftgröße um 20% */
-    /* Fügen Sie weitere Stile hinzu, die Sie anpassen möchten */
-  }
+    .field input[type="text"],
+    .field input[type="date"],
+    .field input[type="email"],
+    .field input[type="tel"],
+    .field select {
+        padding: 0.5em;
+        font-size: 0.8em;
+    }
 }
-
-

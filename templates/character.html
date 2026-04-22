@@ -1,20 +1,18 @@
-<!-- Character.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creating your Character</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="form-container">
+    <main class="form-container">
         <form autocomplete="off" method="post" action="/process_character" enctype="multipart/form-data">
-            <div class="welcome-container">
+            <header class="welcome-container">
                 <h1>Creating your Character</h1>
+            </header>
 
-            </div>
             <div class="fields-container">
                 <div class="fields-column">
                     <div class="field">
@@ -56,6 +54,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="fields-column">
                     <div class="image-container">
                         <input type="file" id="image-upload" name="image" accept="image/jpeg, image/png">
@@ -64,23 +63,23 @@
                                 <img id="uploaded_image" src="{{ url_for('static', filename='temp_uploads/' + session.get('user_folder') + '/' + session.get('image_name')) }}" alt="Character Image">
                             {% else %}
                                 <img id="uploaded-image" src="{{ url_for('static', filename='upload.svg') }}" alt="Upload image">
-                            {% endif%}
+                            {% endif %}
                         </label>
                     </div>
                 </div>
-
             </div>
+
             <div class="info-icon">
                 <div class="tooltip">
-                    <p>Hint: </p>
+                    <p>Hint: Upload a professional picture for your CV.</p>
                 </div>
             </div>
+
             <div class="button-container">
-                <button type="submit" formaction="/process_character" class="button next-button">Next</button>
+                <button type="submit" class="button next-button">Next</button>
             </div>
         </form>
-
-    </div>
+    </main>
 
     <script>
         document.getElementById('image-upload').addEventListener('change', function(event) {
@@ -100,7 +99,7 @@
                         reader.onload = function(e) {
                             uploadedImage.src = e.target.result;
                         };
-                    }else {
+                    } else {
                         reader.onload = function(e) {
                             image.src = e.target.result;
                         };
@@ -111,7 +110,6 @@
                 }
             });
         });
-
     </script>
 </body>
 </html>

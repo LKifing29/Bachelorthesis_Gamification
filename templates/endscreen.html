@@ -1,29 +1,20 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submitpage</title>
-    <link rel="stylesheet" href="/static/styles.css">
-
+    <title>Submit Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="landing-container">
-        <h1>Are all your information correct? <br> Go on with submit or otherwise go back and change your information</h1>
-    </div>
+    <main class="landing-container">
+        <h1>Is all your information correct?</h1>
+        <p>Proceed to generate your PDF or go back to edit.</p>
+    </main>
+
     <div class="button-container">
-        <button type="submit" id="submitButton" class="button next-button">Submit</button>
-        <button id="backButton" class="button back-button">Back</button>
+        <button type="button" onclick="window.open('{{ url_for('create_pdf') }}', '_self')" class="button next-button">Generate PDF</button>
+        <button type="button" onclick="window.location.href='{{ url_for('perkmenu') }}'" class="button back-button">Back</button>
     </div>
-    <script>
-        document.getElementById('backButton').addEventListener('click', function(event) {
-            window.location.href = "{{ url_for('perkmenu') }}";
-        });
-        document.getElementById('submitButton').addEventListener('click', function(event) {
-             window.location.href = "{{ url_for('create_pdf') }}";
-        });
-    </script>
 </body>
 </html>

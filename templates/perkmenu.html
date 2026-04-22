@@ -3,43 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perkmenu</title>
+    <title>Perks & Tools</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="form-container">
-        <form autocomplete="off" method="post" action="/submit_perkmenu" enctype="multipart/form-data">
-            <div class="welcome-container">
-                <h1>Choosing your perks and tools</h1>
-            </div>
+    <main class="form-container">
+        <form autocomplete="off" method="post" action="/submit_perkmenu">
+            <header class="welcome-container">
+                <h1>Choosing your Perks and Tools</h1>
+            </header>
+
             <div class="fields-container">
                 <div class="tools-container">
-                    <label for="learned_programs">Learned tools</label><br>
-                    <textarea id="learned_programs" style="resize: none;" name="learned_programs" rows="10" cols="30" placeholder="Only use one word per row">{{ tool_data }}</textarea><br>
+                    <label for="learned_programs">Learned Tools</label><br>
+                    <textarea id="learned_programs" style="resize: none;" name="learned_programs" rows="10" cols="30" placeholder="One tool per row">{{ tool_data }}</textarea>
                 </div>
                 <div class="perks-container">
-                    <label for="hobbys">Hobbys</label><br>
-                    <textarea id="hobbys" style="resize: none;" name="hobbys" rows="10" cols="30" placeholder="Only use one word per row">{{ hobbys }}</textarea><br>
+                    <label for="hobbys">Hobbies</label><br>
+                    <textarea id="hobbys" style="resize: none;" name="hobbys" rows="10" cols="30" placeholder="One hobby per row">{{ hobbys }}</textarea>
                 </div>
-
             </div>
+
             <div class="info-icon">
                 <div class="tooltip">
-                    <p>Hint: Only use one word per row</p>
+                    <p>Hint: Only use one word/phrase per row</p>
                 </div>
             </div>
+
             <div class="button-container">
-                <button type="submit" id="nextButton" formaction="/submit_perkmenu" class="button next-button">Next</button>
-                <button id="backButton" class="button back-button">Back</button>
+                <button type="submit" class="button next-button">Next</button>
+                <button type="button" onclick="window.location.href='{{ url_for('skilltree') }}'" class="button back-button">Back</button>
             </div>
         </form>
-    <script>
-        document.getElementById('backButton').addEventListener('click', function(event) {
-            event.preventDefault();
-            window.location.href = "{{ url_for('skilltree') }}";
-        });
-
-    </script>
-    </div>
+    </main>
 </body>
 </html>

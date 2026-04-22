@@ -1,27 +1,17 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herzlich Willkommen</title>
-    <link rel="stylesheet" href="/static/styles.css">
-
+    <title>Welcome - Application Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="landing-container">
-        <h1>Welcome to the application generator</h1>
-    <div class="container">
-        <button type="submit" id="nextButton" class="button next-button">Next</button>
-    </div>
-
-
-    </div>
-    <script>
-        document.getElementById('nextButton').addEventListener('click', function(event) {
-            window.location.href = "{{ url_for('character') }}";
-        });
-    </script>
+    <main class="landing-container">
+        <h1>Welcome to the Application Generator</h1>
+        <div class="container">
+            <a href="{{ url_for('character') }}" class="button next-button">Start Application</a>
+        </div>
+    </main>
 </body>
 </html>
