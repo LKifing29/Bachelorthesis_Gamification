@@ -31,7 +31,7 @@ This project is built with a focus on clean code principles, separating business
 
 | Character Creation | Interactive Skill Tree |
 | :---: | :---: |
-| <img src="link_to_your_character_image.png" width="400"/> | <img src="link_to_your_skilltree_image.png" width="400"/> |
+| <img src="docs/Screenshot_Charackter_Creation.png" width="400"/> | <img src="docs/Screenshot_SkilltTree.png" width="400"/> |
 
 ## 🚀 How to Run Locally
 

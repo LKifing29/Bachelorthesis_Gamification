@@ -1,0 +1,12 @@
+# IDEs
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# Temporäre Uploads (wichtig für den Datenschutz!)
+static/temp_uploads/*
+!static/temp_uploads/.gitkeep
