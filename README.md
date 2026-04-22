@@ -27,7 +27,6 @@ This project is built with a focus on clean code principles, separating business
   * Stateless routing & secure file handling.
 
 ## 📸 Screenshots
-*(Note: Add screenshots of your application here to give recruiters a quick visual impression!)*
 
 | Character Creation | Interactive Skill Tree |
 | :---: | :---: |
